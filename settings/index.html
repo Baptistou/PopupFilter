@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+        <!-- META INFORMATIONS -->
+        <meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>PopupFilter Settings</title>
+		
+		<!-- FAVICON & CSS -->
+		<link rel="icon" type="image/x-icon" href="/images/icon.ico">
+		<link rel="stylesheet" type="text/css" href="custom.css">
+		
+		<!-- JAVASCRIPT -->
+		<script type="text/javascript" src="script.js"></script>
+    </head>
+	
+    <body>
+		<content>
+			<h1 class="center">
+				<img class="middle" src="/images/logo.png">
+				<span class="middle">PopupFilter</span>
+			</h1>
+			<dl class="accordion">
+				<dt class="active">
+					<span class="text">Open tabs (<span id="nbopen">0</span>)</span>
+					<span class="icon"></span>
+				</dt>
+				<dd>
+					<table class="tablist" id="opentabs"></table>
+					<div class="msgbox">No tabs</div>
+				</dd>
+				<dt class="active">
+					<span class="text">On hold tabs (<span id="nbconfirm">0</span>)</span>
+					<span class="icon"></span>
+				</dt>
+				<dd>
+					<table class="tablist" id="confirmtabs"></table>
+					<div class="msgbox">No tabs</div>
+				</dd>
+				<dt class="active">
+					<span class="text">Blocked tabs (<span id="nbclose">0</span>)</span>
+					<span class="icon"></span>
+				</dt>
+				<dd>
+					<table class="tablist" id="closetabs"></table>
+					<div class="msgbox">No tabs</div>
+				</dd>
+			</dl>
+			<ul class="optionlist">
+				<li>
+					<input type="radio" name="option" id="opt1" value="1">
+					<label for="opt1">Normal Mode : Allow the opening of new tabs and new windows.</label>
+				</li>
+				<li>
+					<input type="radio" name="option" id="opt2" value="2">
+					<label for="opt2">Confirm Mode : Ask before opening and displaying content of new tabs/windows.</label>
+				</li>
+				<li>
+					<input type="radio" name="option" id="opt3" value="3">
+					<label for="opt3">Blocking Mode : Block all new tabs/windows opened by links or scripts.</label>
+				</li>
+			</ul>
+			<p class="center">
+				<button class="button" id="clear">Clear History</button>
+				<button class="button" id="close">Close</button>
+			</p>
+		</content>
+	</body>
+</html>

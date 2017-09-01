@@ -1,0 +1,274 @@
+/* -------------------- Global definitions -------------------- */
+
+* {
+	box-sizing: border-box;
+    font-family: "Segoe UI";
+	font-size: 100%;
+}
+
+html {
+	font-size: 1px;
+}
+
+body {
+	padding: 10rem;
+	font-size: 18rem;
+}
+
+content {
+	display: block;
+	max-width: 800rem;
+	margin: auto;
+	animation: fadein 1s;
+}
+
+@keyframes fadein {
+	from{opacity: 0;}
+	to{opacity: 1;}
+}
+
+h1 {
+	margin: 10rem 0;
+	font-size: 30rem;
+}
+
+p {
+	margin: 10rem 0;
+}
+
+.top {
+	vertical-align: top !important;
+}
+
+.middle {
+	vertical-align: middle !important;
+}
+
+.bottom {
+	vertical-align: bottom !important;
+}
+
+.left {
+	text-align: left !important;
+}
+
+.center {
+	text-align: center !important;
+}
+
+.right {
+	text-align: right !important;
+}
+
+.hidden {
+	display: none !important;
+}
+
+/* -------------------- Content -------------------- */
+
+ul.optionlist {
+	display: block;
+	margin: 10rem 0 10rem 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.optionlist>li {
+	padding: 5rem 0 5rem 0;
+}
+
+ul.optionlist>li:hover {
+	background-color: #E0E0E0;
+}
+
+.button {
+	display: inline-block;
+	height: 34rem;
+	line-height: 32rem;
+	min-width: 100rem;
+	margin: 0;
+	padding: 0 10rem 0 10rem;
+	border: 1rem solid #000042;
+	font-size: 18rem;
+	text-decoration: none;
+	text-align: center;
+	background-color: #000042;
+	color: white;
+	cursor: pointer;
+	/* Fix bug in touch screen */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.button:hover {
+	border-color: #0042AA;
+	background-color: #0042AA;
+	transition: 0.2s;
+}
+
+/* Fix CSS bug in Firefox */
+.button::-moz-focus-inner {
+    padding: 0;
+	border: 0;
+}
+
+dl.accordion {
+	display: block;
+}
+
+dl.accordion>dt  {
+	display: block;
+	position: relative;
+	margin: 0;
+	padding: 5rem 40rem 5rem 15rem;
+	border: 1rem solid #AAAAAA;
+	border-width: 0 1rem 1rem 1rem;
+	font-size: 20rem;
+	background-color: #5B6C7D;
+	color: white;
+	cursor: pointer;
+}
+
+dl.accordion>dt:first-child {
+	border-top: 1rem solid #AAAAAA;
+}
+
+dl.accordion>dt:hover {
+	background-color: #0042AA;
+	transition: 0.2s;
+}
+
+dl.accordion>dt.active {
+	background-color: #000042;
+	color: white;
+}
+
+dl.accordion>dt.active:hover {
+	background-color: #0042AA;
+	transition: 0.2s;
+}
+
+dl.accordion>dt>.icon {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	height: 30rem;
+	line-height: 30rem;
+	width: 40rem;
+	margin: auto;
+	font-size: 20rem;
+	text-align: center;
+}
+
+dl.accordion>dt>.icon::before {
+	content: "\2795";
+}
+
+dl.accordion>dt.active>.icon::before {
+	content: "\2796";
+}
+
+dl.accordion>dd  {
+	display: none;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 1rem solid #AAAAAA;
+	border-width: 0 1rem 1rem 1rem;
+	background-color: white;
+}
+
+dl.accordion>dt.active+dd {
+	display: block;
+}
+
+table.tablist {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table.tablist>tr:first-child {
+	border-top: 0;
+}
+
+table.tablist>tr {
+	border-top: 1px solid #E0E0E0;
+}
+
+table.tablist>tr>td:first-child {
+	padding: 5rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+table.tablist>tr>td:last-child {
+	width: 65rem;
+	padding: 0 8rem 0 8rem;
+	text-align: right;
+}
+
+.msgbox {
+	display: none;
+	padding: 5rem;
+	text-align: center;
+}
+
+table.tablist:empty~.msgbox {
+	display: block;
+}
+
+.icon-true, .icon-false, .icon-reset {
+	display: inline-block;
+	margin: 0 2rem 0 2rem;
+	font-size: 24rem;
+	cursor: pointer;
+}
+
+.icon-true {
+	color: #22DD22;
+}
+
+.icon-true:hover {
+	color: #00AA00;
+	transition: 0.2s;
+}
+
+.icon-true::before {
+	content: "\2714";
+}
+
+.icon-false {
+	color: #DD2222;
+}
+
+.icon-false:hover {
+	color: #AA0000;
+	transition: 0.2s;
+}
+
+.icon-false::before {
+	content: "\2716";
+}
+
+.icon-reset {
+	position: relative;
+	top: -2rem;
+	font-weight: bold;
+	color: #0072C6;
+}
+
+.icon-reset:hover {
+	color: #0052A6;
+	transition: 0.2s;
+}
+
+.icon-reset::before {
+	content: "\21BB";
+}
