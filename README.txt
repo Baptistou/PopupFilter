@@ -1,4 +1,4 @@
-﻿PopupFilter version 1.0 by Baptiste Thémine
+﻿PopupFilter version 1.1 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
 This add-on is designed with WebExtensions API and is compatible with Firefox, Chrome and Opera.
@@ -9,6 +9,10 @@ Blocking Mode : Block all new tabs/windows opened by links or scripts.
 PopupFilter contains also a settings webpage which enumerates open/on hold/blocked tabs and permits to do quick actions such as :
 close tab, display blocked content of tab, restore blocked tab, go to tab (double click).
 
+--------------------------------------------------------------------------------
+
+PopupFilter version 1.1 par Baptiste Thémine
+
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
 Cette extension est développée à l'aide de l'API WebExtensions et est compatible avec les navigateurs Firefox, Chrome et Opera.
 3 différents modes sont disponibles :
@@ -18,28 +22,14 @@ Blocking Mode : Bloque tous les nouveaux onglets/fenêtres ouvert(e)s par des li
 PopupFilter contient également une page de paramètres où sont listés les onglets ouverts, en attente de confirmation ou bloqués, et permet d'effectuer des actions rapides telles que :
 fermer un onglet, afficher le contenu bloqué d'un onglet, restaurer un onglet bloqué, aller vers cet onglet (double click).
 
-PopupFilter structure :
-C:.
-│   manifest.json
-│   README.txt
-│   script.js
-│
-├───confirm
-│       custom.css
-│       index.html
-│       script.js
-│
-├───images
-│       icon.ico
-│       logo.png
-│       space.jpg
-│
-├───popup
-│       custom.css
-│       index.html
-│       script.js
-│
-└───settings
-        custom.css
-        index.html
-        script.js
+--------------------------------------------------------------------------------
+
+PopupFilter updates :
+
+* version 1.1 (03/09/2017)
+	- Add new logos for different mode and add badge on toolbar.
+	- Fix issue with Firefox about:config when browser.tabs.closeWindowWithLastTab is set to false.
+	- Code and performance improvements.
+
+* version 1.0 (31/08/2017)
+	First version

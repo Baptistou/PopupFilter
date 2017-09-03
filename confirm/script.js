@@ -14,17 +14,15 @@ window.onload = function(){
 	port.onMessage.addListener(function(msg){
 		document.getElementById("url").value = msg.tab.url;
 		//Redirects to url
-		document.getElementById("display").onclick = function(){
-			window.location = msg.tab.url;
-			port.postMessage({status: 1});
+		document.getElementById("open").onclick = function(){
+			port.postMessage({status: "open"});
 		};
 	});
 	
 	//Closes tab
 	document.getElementById("close").onclick = function(){
 		browser.tabs.getCurrent(function(tab){
-			browser.tabs.remove(tab.id);
-			port.postMessage({status: 3});
+			port.postMessage({status: "close"});
 		});
 	};
 };

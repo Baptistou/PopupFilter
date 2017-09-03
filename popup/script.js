@@ -12,17 +12,17 @@ window.onload = function(){
 	
 	//Retrieves data from port
 	port.onMessage.addListener(function(msg){
-		document.getElementById("opt"+msg.option).checked = true;
 		document.getElementById("nbopen").textContent = msg.opentabs.length;
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
+		document.getElementById("mode"+msg.mode).checked = true;
 	});
 	
 	//Radio boxes
-	var radiobox = document.getElementsByName("option");
+	var radiobox = document.getElementsByName("mode");
 	for(var i=0; i<radiobox.length; i++){
 		radiobox[i].onchange = function(){
-			port.postMessage({status: "option", option: this.value});
+			port.postMessage({status: "mode", mode: this.value});
 		};
 	}
 	

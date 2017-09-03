@@ -12,37 +12,34 @@ window.onload = function(){
 	
 	//Retrieves data from port
 	port.onMessage.addListener(function(msg){
-		document.getElementById("opt"+msg.option).checked = true;
 		document.getElementById("nbopen").textContent = msg.opentabs.length;
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
 		tabstohtml(document.getElementById("opentabs"),msg.opentabs,[closebtn]);
 		tabstohtml(document.getElementById("confirmtabs"),msg.confirmtabs,[openbtn,closebtn]);
 		tabstohtml(document.getElementById("closetabs"),msg.closetabs,[restorebtn]);
+		document.getElementById("mode"+msg.mode).checked = true;
 	});
-	
-	//Radio boxes
-	var radiobox = document.getElementsByName("option");
-	for(var i=0; i<radiobox.length; i++){
-		radiobox[i].onchange = function(){
-			port.postMessage({status: "option", option: this.value});
-		};
-	}
 	
 	//Accordion menu
 	var menu = document.querySelectorAll("dl.accordion>dt");
 	for(var i=0; i<menu.length; i++){
 		menu[i].onclick = function(){
-			if(this.className=="active") this.className = "";
-			else this.className = "active";
+			this.className = (this.className=="")?"active":"";
+		};
+	}
+	
+	//PopupFilter Modes
+	var radiobox = document.getElementsByName("mode");
+	for(var i=0; i<radiobox.length; i++){
+		radiobox[i].onchange = function(){
+			port.postMessage({status: "mode", mode: this.value});
 		};
 	}
 	
 	//Clears history
 	document.getElementById("clear").onclick = function(){
-		browser.tabs.getCurrent(function(tab){
-			port.postMessage({status: "clear"});
-		});
+		port.postMessage({status: "clear"});
 	};
 	
 	//Closes settings page
@@ -66,8 +63,7 @@ var openbtn = function(tab){
 	button.className = "icon-true";
 	button.title = "Display";
 	button.onclick = function(){
-		port.postMessage({status: "open", tabid: tab.id});
-		browser.tabs.update(tab.id,{url: tab.url});
+		port.postMessage({status: "open", tab: tab});
 	};
 	return button;
 };
@@ -76,7 +72,7 @@ var closebtn = function(tab){
 	button.className = "icon-false";
 	button.title = "Close";
 	button.onclick = function(){
-		browser.tabs.remove(tab.id);
+		port.postMessage({status: "close", tab: tab});
 	};
 	return button;
 };
@@ -85,8 +81,7 @@ var restorebtn = function(tab){
 	button.className = "icon-reset";
 	button.title = "Restore";
 	button.onclick = function(){
-		port.postMessage({status: "restore", tabid: tab.id});
-		browser.tabs.create({url: tab.url, active: false});
+		port.postMessage({status: "restore", tab: tab});
 	};
 	return button;
 };
