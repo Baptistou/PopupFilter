@@ -46,7 +46,7 @@ function Settings(){
 	
 	this.showtab = function(){
 		if(this.tab){
-			browser.windows.update(this.tab.windowId,{focused: true});
+			if(browser.windows) browser.windows.update(this.tab.windowId,{focused: true});
 			browser.tabs.update(this.tab.id,{active: true});}
 		else browser.tabs.create({url: "/settings/index.html"},function(tab){self.tab = tab;});
 	};
@@ -58,15 +58,17 @@ function Settings(){
 	};
 	
 	//Private methods
+	//Icon dynamic change (No Firefox Android support)
 	var seticon = function(mode){
-		var icons = {
-			1: "images/logo-normal.png",
-			2: "images/logo-confirm.png",
-			3: "images/logo-blocking.png"
-		};
-		var colors = {1: "", 2: "#EADA09", 3: "red"};
-		browser.browserAction.setIcon({path: icons[mode]});
-		browser.browserAction.setBadgeBackgroundColor({color: colors[mode]});
+		if(browser.windows){
+			var icons = {
+				1: "/images/icon-normal.png",
+				2: "/images/icon-confirm.png",
+				3: "/images/icon-blocking.png"
+			};
+			var colors = {1: "", 2: "#EADA09", 3: "red"};
+			browser.browserAction.setIcon({path: icons[mode]});
+			browser.browserAction.setBadgeBackgroundColor({color: colors[mode]});}
 	};
 }
 
@@ -219,7 +221,7 @@ browser.webRequest.onBeforeRequest.addListener(
 );
 
 //Window focus change
-browser.windows.onFocusChanged.addListener(function(winid){
+if(browser.windows) browser.windows.onFocusChanged.addListener(function(winid){
 	if(settings.tab && settings.tab.active && settings.tab.windowId==winid) updatehistory();
 });
 
@@ -262,10 +264,12 @@ browser.runtime.onConnect.addListener(function(port){
 //about:config --> browser.tabs.closeWindowWithLastTab
 function closetab(tabid){
 	browser.tabs.get(tabid,function(tab){
-		browser.windows.get(tab.windowId,{populate: true},function(window){
-			if(window.tabs.length<=1) browser.windows.remove(window.id);
-			else browser.tabs.remove(tab.id);
-		});
+		if(browser.windows)
+			browser.windows.get(tab.windowId,{populate: true},function(window){
+				if(window.tabs.length<=1) browser.windows.remove(window.id);
+				else browser.tabs.remove(tab.id);
+			});
+		else browser.tabs.remove(tab.id);
 	});
 }
 
@@ -282,12 +286,13 @@ function updatehistory(){
 	},500);
 }
 
-//Updates browserAction badge
+//Updates browserAction badge (No Firefox Android support)
 function updatebadge(){
-	if(settings.mode!=1){
-		var badge = (tabhistory.get({status: settings.mode}).length || "").toString();
-		browser.browserAction.setBadgeText({text: badge});}
-	else browser.browserAction.setBadgeText({text: ""});
+	if(browser.windows){
+		if(settings.mode!=1){
+			var badge = (tabhistory.get({status: settings.mode}).length || "").toString();
+			browser.browserAction.setBadgeText({text: badge});}
+		else browser.browserAction.setBadgeText({text: ""});}
 }
 
 //Connects to confirm script

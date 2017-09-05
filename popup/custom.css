@@ -15,6 +15,12 @@ body {
 	font-size: 18rem;
 }
 
+content {
+	display: block;
+	max-width: 400rem;
+	margin: auto;
+}
+
 h1 {
 	margin: 10rem 0;
 	font-size: 30rem;

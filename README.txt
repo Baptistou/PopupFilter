@@ -1,4 +1,4 @@
-﻿PopupFilter version 1.1 by Baptiste Thémine
+﻿PopupFilter version 1.2 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
 This add-on is designed with WebExtensions API and is compatible with Firefox, Chrome and Opera.
@@ -11,7 +11,7 @@ close tab, display blocked content of tab, restore blocked tab, go to tab (doubl
 
 --------------------------------------------------------------------------------
 
-PopupFilter version 1.1 par Baptiste Thémine
+PopupFilter version 1.2 par Baptiste Thémine
 
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
 Cette extension est développée à l'aide de l'API WebExtensions et est compatible avec les navigateurs Firefox, Chrome et Opera.
@@ -26,10 +26,16 @@ fermer un onglet, afficher le contenu bloqué d'un onglet, restaurer un onglet b
 
 PopupFilter updates :
 
+* version 1.2 (05/09/2017)
+- PopupFilter icon improvements such as dynamic change on browser action popup and settings page.
+- Fix compatibility issue with browser.windows API on Firefox Android.
+- Fix compatibility issue with browser.browserAction API on Firefox Android.
+
 * version 1.1 (03/09/2017)
-	- Add new logos for different mode and add badge on toolbar.
-	- Fix issue with Firefox about:config when browser.tabs.closeWindowWithLastTab is set to false.
-	- Code and performance improvements.
+- Add new icons according to PopupFilter modes and add badge on toolbar.
+- Fix issue with Firefox about:config when browser.tabs.closeWindowWithLastTab is set to false.
+- Code and performance improvements.
 
 * version 1.0 (31/08/2017)
-	First version
+First version :)
+Note: As Firefox Android APIs are currently under development by Mozilla, the full support for Android version will come in future updates.

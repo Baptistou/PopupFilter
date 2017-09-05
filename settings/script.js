@@ -19,6 +19,7 @@ window.onload = function(){
 		tabstohtml(document.getElementById("confirmtabs"),msg.confirmtabs,[openbtn,closebtn]);
 		tabstohtml(document.getElementById("closetabs"),msg.closetabs,[restorebtn]);
 		document.getElementById("mode"+msg.mode).checked = true;
+		seticon(msg.mode);
 	});
 	
 	//Accordion menu
@@ -96,7 +97,7 @@ function tabstohtml(table,tablist,actionbtn){
 		col.title = tab.url;
 		col.textContent = tab.url;
 		col.ondblclick = function(){
-			browser.windows.update(tab.win,{focused: true});
+			if(browser.windows) browser.windows.update(tab.win,{focused: true});
 			browser.tabs.update(tab.id,{active: true});
 		};
 		row.appendChild(col);
@@ -104,4 +105,14 @@ function tabstohtml(table,tablist,actionbtn){
 		for(var j=0; j<actionbtn.length; j++) col.appendChild(actionbtn[j](tablist[i]));
 		row.appendChild(col);
 		table.appendChild(row);}
+}
+
+//Changes icon according to mode
+function seticon(mode){
+	var icons = {
+		1: "/images/icon-normal.png",
+		2: "/images/icon-confirm.png",
+		3: "/images/icon-blocking.png"
+	};
+	document.getElementById("icon").src = icons[mode];
 }

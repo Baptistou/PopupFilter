@@ -16,6 +16,7 @@ window.onload = function(){
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
 		document.getElementById("mode"+msg.mode).checked = true;
+		seticon(msg.mode);
 	});
 	
 	//Radio boxes
@@ -36,3 +37,15 @@ window.onload = function(){
 window.onunload = function(){
 	port.disconnect();
 };
+
+/* -------------------- Functions -------------------- */
+
+//Changes icon according to mode
+function seticon(mode){
+	var icons = {
+		1: "/images/icon-normal.png",
+		2: "/images/icon-confirm.png",
+		3: "/images/icon-blocking.png"
+	};
+	document.getElementById("icon").src = icons[mode];
+}
