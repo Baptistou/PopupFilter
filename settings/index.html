@@ -20,6 +20,8 @@
 				<img class="middle" id="icon" src="/images/icon48.png">
 				<span class="middle">PopupFilter</span>
 			</h1>
+			
+			<!-- TAB LISTS -->
 			<dl class="accordion">
 				<dt class="active">
 					<span class="text">Open tabs (<span id="nbopen">0</span>)</span>
@@ -46,20 +48,46 @@
 					<div class="msgbox">No tabs</div>
 				</dd>
 			</dl>
-			<ul class="optionlist">
-				<li>
-					<input type="radio" name="mode" id="mode1" value="1">
-					<label for="mode1">Normal Mode : Allow the opening of new tabs and new windows.</label>
-				</li>
-				<li>
-					<input type="radio" name="mode" id="mode2" value="2">
-					<label for="mode2">Confirm Mode : Ask before opening and displaying content of new tabs/windows.</label>
-				</li>
-				<li>
-					<input type="radio" name="mode" id="mode3" value="3">
-					<label for="mode3">Blocking Mode : Block all new tabs/windows opened by links or scripts.</label>
-				</li>
-			</ul>
+			
+			<!-- MODES -->
+			<div class="setting">
+				<h2>Modes</h2>
+				<ul class="optionlist-v">
+					<li>
+						<input type="radio" name="mode" id="mode1" value="1">
+						<label for="mode1">Normal Mode : Allow the opening of new tabs and new windows.</label>
+					</li>
+					<li>
+						<input type="radio" name="mode" id="mode2" value="2">
+						<label for="mode2">Confirm Mode : Ask before opening and displaying content of new tabs/windows.</label>
+					</li>
+					<li>
+						<input type="radio" name="mode" id="mode3" value="3">
+						<label for="mode3">Blocking Mode : Block all new tabs/windows opened by links or scripts.</label>
+					</li>
+				</ul>
+			</div>
+			
+			<!-- OPTIONS -->
+			<div class="setting">
+				<h2>Options</h2>
+				<p>In Confirm Mode, the new tabs/windows must be opened in :</p>
+				<ul class="optionlist-h">
+					<li>
+						<input type="radio" name="popupfocus" id="popupfocus1" value="1">
+						<label for="popupfocus1">Default</label>
+					</li>
+					<li>
+						<input type="radio" name="popupfocus" id="popupfocus2" value="2">
+						<label for="popupfocus2">Background</label>
+					</li>
+					<li>
+						<input type="radio" name="popupfocus" id="popupfocus3" value="3">
+						<label for="popupfocus3">Foreground</label>
+					</li>
+				</ul>
+			</div>
+			
 			<p class="center">
 				<button class="button" id="clear">Clear History</button>
 				<button class="button" id="close">Close</button>

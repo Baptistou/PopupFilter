@@ -19,6 +19,7 @@ window.onload = function(){
 		tabstohtml(document.getElementById("confirmtabs"),msg.confirmtabs,[openbtn,closebtn]);
 		tabstohtml(document.getElementById("closetabs"),msg.closetabs,[restorebtn]);
 		document.getElementById("mode"+msg.mode).checked = true;
+		document.getElementById("popupfocus"+msg.options.popupfocus).checked = true;
 		seticon(msg.mode);
 	});
 	
@@ -30,13 +31,19 @@ window.onload = function(){
 		};
 	}
 	
-	//PopupFilter Modes
+	//Modes
 	var radiobox = document.getElementsByName("mode");
 	for(var i=0; i<radiobox.length; i++){
 		radiobox[i].onchange = function(){
-			port.postMessage({status: "mode", mode: this.value});
-		};
-	}
+			port.postMessage({status: "mode", mode: parseInt(this.value)});
+		};}
+	
+	//Options
+	radiobox = document.getElementsByName("popupfocus");
+	for(var i=0; i<radiobox.length; i++){
+		radiobox[i].onchange = function(){
+			port.postMessage({status: "options", options: {popupfocus: parseInt(this.value)}});
+		};}
 	
 	//Clears history
 	document.getElementById("clear").onclick = function(){

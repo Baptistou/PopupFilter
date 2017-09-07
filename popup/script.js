@@ -23,7 +23,7 @@ window.onload = function(){
 	var radiobox = document.getElementsByName("mode");
 	for(var i=0; i<radiobox.length; i++){
 		radiobox[i].onchange = function(){
-			port.postMessage({status: "mode", mode: this.value});
+			port.postMessage({status: "mode", mode: parseInt(this.value)});
 		};
 	}
 	

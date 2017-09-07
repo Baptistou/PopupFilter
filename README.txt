@@ -1,9 +1,9 @@
-﻿PopupFilter version 1.2 by Baptiste Thémine
+﻿PopupFilter version 1.3 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
-This add-on is designed with WebExtensions API and is compatible with Firefox, Chrome and Opera.
-3 different modes are available :
-Normal Mode : Allow the opening of new tabs and new windows (normal behaviour).
+PopupFilter is a simple and lightweight add-on designed with WebExtensions API and compatible with Firefox, Chrome and Opera.
+It's easy to switch between 3 different available modes :
+Normal Mode : Allow the opening of new tabs and new windows. (normal behaviour)
 Confirm Mode : Ask before opening and displaying content of new tabs/windows.
 Blocking Mode : Block all new tabs/windows opened by links or scripts.
 PopupFilter contains also a settings webpage which enumerates open/on hold/blocked tabs and permits to do quick actions such as :
@@ -11,11 +11,11 @@ close tab, display blocked content of tab, restore blocked tab, go to tab (doubl
 
 --------------------------------------------------------------------------------
 
-PopupFilter version 1.2 par Baptiste Thémine
+PopupFilter version 1.3 par Baptiste Thémine
 
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
-Cette extension est développée à l'aide de l'API WebExtensions et est compatible avec les navigateurs Firefox, Chrome et Opera.
-3 différents modes sont disponibles :
+PopupFilter est une extension simple et légère développée à l'aide de l'API WebExtensions et compatible avec les navigateurs Firefox, Chrome et Opera.
+Il est facile de basculer entre 3 différents modes disponibles :
 Normal Mode : Autorise l'ouverture de nouveaux onglets et nouvelles fenêtres (comportement normal).
 Confirm Mode : Demande une confirmation avant d'ouvrir et d'afficher le contenu de nouveaux onglets/fenêtres.
 Blocking Mode : Bloque tous les nouveaux onglets/fenêtres ouvert(e)s par des liens ou des scripts.
@@ -26,8 +26,13 @@ fermer un onglet, afficher le contenu bloqué d'un onglet, restaurer un onglet b
 
 PopupFilter updates :
 
+* version 1.3 (07/09/2017)
+- Add a new option in Settings page that permits to control popup focus on opening.
+- PopupFilter icon and badge improvements.
+- Code and performance improvements.
+
 * version 1.2 (05/09/2017)
-- PopupFilter icon improvements such as dynamic change on browser action popup and settings page.
+- PopupFilter icon improvements such as dynamic change on browserAction popup and settings page.
 - Fix compatibility issue with browser.windows API on Firefox Android.
 - Fix compatibility issue with browser.browserAction API on Firefox Android.
 

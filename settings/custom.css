@@ -32,6 +32,11 @@ h1 {
 	font-size: 30rem;
 }
 
+h2 {
+	margin: 10rem 0;
+	font-size: 20rem;
+}
+
 p {
 	margin: 10rem 0;
 }
@@ -64,55 +69,7 @@ p {
 	display: none !important;
 }
 
-/* -------------------- Content -------------------- */
-
-ul.optionlist {
-	display: block;
-	margin: 10rem 0 10rem 0;
-	padding: 0;
-	list-style: none;
-}
-
-ul.optionlist>li {
-	padding: 5rem 0 5rem 0;
-}
-
-ul.optionlist>li:hover {
-	background-color: #E0E0E0;
-}
-
-.button {
-	display: inline-block;
-	height: 34rem;
-	line-height: 32rem;
-	min-width: 100rem;
-	margin: 0;
-	padding: 0 10rem 0 10rem;
-	border: 1rem solid #000042;
-	font-size: 18rem;
-	text-decoration: none;
-	text-align: center;
-	background-color: #000042;
-	color: white;
-	cursor: pointer;
-	/* Fix bug in touch screen */
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-.button:hover {
-	border-color: #0042AA;
-	background-color: #0042AA;
-	transition: 0.2s;
-}
-
-/* Fix CSS bug in Firefox */
-.button::-moz-focus-inner {
-    padding: 0;
-	border: 0;
-}
+/* -------------------- Tab Lists -------------------- */
 
 dl.accordion {
 	display: block;
@@ -198,7 +155,7 @@ table.tablist>tr:first-child {
 }
 
 table.tablist>tr {
-	border-top: 1px solid #E0E0E0;
+	border-top: 1rem solid #E0E0E0;
 }
 
 table.tablist>tr>td:first-child {
@@ -271,4 +228,75 @@ table.tablist:empty~.msgbox {
 
 .icon-reset::before {
 	content: "\21BB";
+}
+
+/* -------------------- Settings -------------------- */
+
+.setting {
+	margin: 20rem 0 20rem 0;
+	border-bottom: 1px solid #E0E0E0;
+}
+
+ul.optionlist-v {
+	display: block;
+	margin: 10rem 0 10rem 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.optionlist-v>li {
+	padding: 5rem 0 5rem 0;
+}
+
+ul.optionlist-v>li:hover {
+	background-color: #E0E0E0;
+}
+
+ul.optionlist-h {
+	display: block;
+	margin: 10rem 0 10rem 0;
+	padding: 0;
+}
+
+ul.optionlist-h>li {
+	display: inline-block;
+	padding: 5rem;
+	margin: 0 5rem 0 5rem;
+}
+
+ul.optionlist-h>li:hover {
+	background-color: #E0E0E0;
+}
+
+.button {
+	display: inline-block;
+	height: 34rem;
+	line-height: 32rem;
+	min-width: 100rem;
+	margin: 0;
+	padding: 0 10rem 0 10rem;
+	border: 1rem solid #000042;
+	font-size: 18rem;
+	text-decoration: none;
+	text-align: center;
+	background-color: #000042;
+	color: white;
+	cursor: pointer;
+	/* Fix bug in touch screen */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.button:hover {
+	border-color: #0042AA;
+	background-color: #0042AA;
+	transition: 0.2s;
+}
+
+/* Fix CSS bug in Firefox */
+.button::-moz-focus-inner {
+    padding: 0;
+	border: 0;
 }

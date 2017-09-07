@@ -25,53 +25,6 @@ Array.prototype.removeIf = function(callback){
 
 /* -------------------- Classes -------------------- */
 
-function Settings(){
-	//Variables
-	this.tab = null;
-	this.mode = 1;
-	var self = this;
-	
-	//Retrieves data from local storage
-	browser.storage.local.get(function(storage){
-		self.mode = storage.mode || 1;
-		seticon(self.mode);
-	});
-	
-	//Public methods
-	this.setmode = function(val){
-		this.mode = parseInt(val);
-		browser.storage.local.set({mode: this.mode});
-		seticon(this.mode);
-	};
-	
-	this.showtab = function(){
-		if(this.tab){
-			if(browser.windows) browser.windows.update(this.tab.windowId,{focused: true});
-			browser.tabs.update(this.tab.id,{active: true});}
-		else browser.tabs.create({url: "/settings/index.html"},function(tab){self.tab = tab;});
-	};
-	
-	this.update = function(tabs){
-		if(this.tab) settings.tab = tabs.find(function(val){
-			return (val.id==self.tab.id);
-		});
-	};
-	
-	//Private methods
-	//Icon dynamic change (No Firefox Android support)
-	var seticon = function(mode){
-		if(browser.windows){
-			var icons = {
-				1: "/images/icon-normal.png",
-				2: "/images/icon-confirm.png",
-				3: "/images/icon-blocking.png"
-			};
-			var colors = {1: "", 2: "#EADA09", 3: "red"};
-			browser.browserAction.setIcon({path: icons[mode]});
-			browser.browserAction.setBadgeBackgroundColor({color: colors[mode]});}
-	};
-}
-
 function TabHistory(){
 	//Variables
 	this.data = [{id: -1, status: -1}]; //Chrome compatibility
@@ -81,6 +34,13 @@ function TabHistory(){
 	browser.tabs.query({},function(tabs){
 		self.update(tabs);
 	});
+	
+	//Private methods
+	var equals = function(val,obj){
+		for(var prop in obj){
+			if(val[prop]!=obj[prop]) return false;}
+		return true;
+	};
 	
 	//Public methods
 	this.contains = function(obj){
@@ -139,13 +99,6 @@ function TabHistory(){
 			return (val.status==2 || val.status==3);
 		});
 	};
-	
-	//Private methods
-	var equals = function(val,obj){
-		for(var prop in obj){
-			if(val[prop]!=obj[prop]) return false;}
-		return true;
-	};
 }
 
 function PortConnect(){
@@ -175,6 +128,92 @@ function PortConnect(){
 	};
 }
 
+function Settings(){
+	//Variables
+	this.mode = 1;
+	this.options = {};
+	this.tab = null;
+	var self = this;
+	var timeout = null;
+	
+	//Retrieves data from local storage
+	browser.storage.local.get(function(storage){
+		self.mode = storage.mode || 1;
+		updateicon(self.mode);
+		self.options = storage.options || {};
+		self.options = {
+			popupfocus: self.options.popupfocus || 1
+		};
+	});
+	
+	//Private methods
+	var createtab = function(tab){
+		self.tab = tab;
+		if(browser.windows) browser.windows.onFocusChanged.addListener(focuswin);
+		browser.tabs.onActivated.addListener(focustab);
+		browser.tabs.onMoved.addListener(movetab);
+		browser.tabs.onRemoved.addListener(removetab);
+	};
+	
+	var focuswin = function(winid){
+		if(self.tab && self.tab.active && self.tab.windowId==winid) self.update();
+	};
+	
+	var focustab = function(info){
+		if(self.tab && self.tab.id==info.tabId) self.update();
+	};
+	
+	var movetab = function(tabid){
+		if(self.tab && self.tab.id==tabid) self.update();
+	};
+	
+	var removetab = function(tabid){
+		if(self.tab && self.tab.id==tabid){
+			self.tab = null;
+			if(browser.windows) browser.windows.onFocusChanged.removeListener(focuswin);
+			browser.tabs.onActivated.removeListener(focustab);
+			browser.tabs.onMoved.removeListener(movetab);
+			browser.tabs.onRemoved.removeListener(removetab);}
+	};
+	
+	//Public methods
+	this.setmode = function(val){
+		this.mode = parseInt(val);
+		browser.storage.local.set({mode: this.mode});
+		updateicon(this.mode);
+	};
+	
+	this.setoptions = function(obj){
+		for(var prop in obj) this.options[prop] = obj[prop];
+		browser.storage.local.set({options: this.options});
+	};
+	
+	this.open = function(){
+		if(this.tab){
+			if(browser.windows) browser.windows.update(this.tab.windowId,{focused: true});
+			browser.tabs.update(this.tab.id,{active: true});}
+		else browser.tabs.create({url: "/settings/index.html", active: true},createtab);
+	};
+	
+	this.close = function(){
+		if(this.tab) browser.tabs.remove(this.tab.id);
+	};
+	
+	this.update = function(){
+		if(timeout) clearTimeout(timeout);
+		timeout = setTimeout(function(){
+			browser.tabs.query({},function(tabs){
+				tabhistory.update(tabs);
+				if(self.tab) settings.tab = tabs.find(function(val){
+					return (val.id==self.tab.id);
+				});
+				portcon.send(["popup","settings"]);
+			});
+			timeout = null;
+		},500);
+	};
+}
+
 /* -------------------- Main Process -------------------- */
 
 //Chrome compatibility
@@ -184,9 +223,9 @@ var browser = browser || chrome;
 var tabhistory = new TabHistory();
 var portcon = new PortConnect();
 var settings = new Settings();
-var timeout = null;
 
 //Tab creation
+//Note: Firefox Android not firing with links
 browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
 	tabhistory.set({
 		id: info.tabId,
@@ -197,7 +236,7 @@ browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
 	case 1 : //Do nothing
 	break;
 	case 2 :
-		browser.tabs.update(info.tabId,{url: "/confirm/index.html#"+info.tabId});
+		redirectconfirm(info);
 		updatebadge();
 	break;
 	case 3 :
@@ -220,26 +259,10 @@ browser.webRequest.onBeforeRequest.addListener(
 	{urls: ["<all_urls>"], types: ["main_frame"]}
 );
 
-//Window focus change
-if(browser.windows) browser.windows.onFocusChanged.addListener(function(winid){
-	if(settings.tab && settings.tab.active && settings.tab.windowId==winid) updatehistory();
-});
-
-//Tab focus change
-browser.tabs.onActivated.addListener(function(info){
-	if(settings.tab && settings.tab.id==info.tabId) updatehistory();
-});
-
-//Tab move
-browser.tabs.onMoved.addListener(function(tabid){
-	if(settings.tab && settings.tab.id==tabid) updatehistory();
-});
-
-//Tab deletion
-browser.tabs.onRemoved.addListener(function(tabid,info){
+//Tab close
+browser.tabs.onRemoved.addListener(function(tabid){
 	if(tabhistory.contains({id: tabid, status: 1})) tabhistory.remove(tabid);
 	if(tabhistory.contains({id: tabid, status: 2})) tabhistory.set({id: tabid, status: 3});
-	if(settings.tab && settings.tab.id==tabid) settings.tab = null;
 	portcon.send(["popup","settings"]);
 	updatebadge();
 });
@@ -260,8 +283,28 @@ browser.runtime.onConnect.addListener(function(port){
 
 /* -------------------- Functions -------------------- */
 
+//Redirects to confirm page
+function redirectconfirm(info){
+	var url = "/confirm/index.html#"+info.tabId;
+	switch(settings.options.popupfocus){
+	case 1 : browser.tabs.update(info.tabId,{url: url});
+	break;
+	case 2 :
+		browser.tabs.update(info.tabId,{url: url, active: false});
+		if(browser.windows)
+			browser.tabs.get(info.sourceTabId,function(tab){
+				browser.windows.update(tab.windowId,{focused: true});
+			});
+		browser.tabs.update(info.sourceTabId,{active: true});
+	break;
+	case 3 :
+		if(browser.windows) browser.windows.update(info.windowId,{focused: true});
+		browser.tabs.update(info.tabId,{url: url, active: true});
+	break;}
+}
+
 //Closes specified tab and its window
-//about:config --> browser.tabs.closeWindowWithLastTab
+//Note: about:config --> browser.tabs.closeWindowWithLastTab
 function closetab(tabid){
 	browser.tabs.get(tabid,function(tab){
 		if(browser.windows)
@@ -273,18 +316,18 @@ function closetab(tabid){
 	});
 }
 
-//Updates tab history and send info to ports
-function updatehistory(){
-	if(timeout) clearTimeout(timeout);
-	timeout = setTimeout(function(){
-		browser.tabs.query({},function(tabs){
-			tabhistory.update(tabs);
-			settings.update(tabs);
-			portcon.send(["popup","settings"]);
-		});
-		timeout = null;
-	},500);
-}
+//Updates browserAction icon (No Firefox Android support)
+function updateicon(mode){
+	if(browser.windows){
+		var icons = {
+			1: "/images/icon-normal.png",
+			2: "/images/icon-confirm.png",
+			3: "/images/icon-blocking.png"
+		};
+		var colors = {1: "", 2: "orange", 3: "red"};
+		browser.browserAction.setIcon({path: icons[mode]});
+		browser.browserAction.setBadgeBackgroundColor({color: colors[mode]});}
+};
 
 //Updates browserAction badge (No Firefox Android support)
 function updatebadge(){
@@ -327,24 +370,25 @@ function settingscon(port){
 			opentabs: tabhistory.get({status: 1}),
 			confirmtabs: tabhistory.get({status: 2}),
 			closetabs: tabhistory.get({status: 3}),
-			mode: settings.mode
+			mode: settings.mode,
+			options: settings.options
 		}},
 		msgget: function(msg){
 			switch(msg.status){
-			case "settings" : settings.showtab();
+			case "settings" : settings.open();
 			break;
 			case "mode" :
 				settings.setmode(msg.mode);
 				updatebadge();
+			break;
+			case "options" : settings.setoptions(msg.options);
 			break;
 			case "open" :
 				tabhistory.set({id: msg.tab.id, status: 1});
 				browser.tabs.update(msg.tab.id,{url: msg.tab.url});
 				updatebadge();
 			break;
-			case "close" :
-				tabhistory.set({id: msg.tab.id, status: 3});
-				closetab(msg.tab.id);
+			case "close" : closetab(msg.tab.id);
 			break;
 			case "restore" :
 				tabhistory.remove(msg.tab.id);
