@@ -15,11 +15,9 @@ Array.prototype.findAll = function(callback){
 
 //Removes element if condition is true
 Array.prototype.removeIf = function(callback){
-	var list = [], index;
-	do{
-		index = this.findIndex(callback);
-		if(index>=0) list.push(this.splice(index,1)[0]);
-	}while(index>=0);
+	var list = [];
+	for(var i=0; i<this.length; i++){
+		if(callback(this[i])) list.push(this.splice(i--,1)[0]);}
 	return list;
 };
 
@@ -27,7 +25,7 @@ Array.prototype.removeIf = function(callback){
 
 function TabHistory(){
 	//Variables
-	this.data = [{id: -1, status: -1}]; //Chrome compatibility
+	this.data = [];
 	var self = this;
 	
 	//Retrieves tab list
@@ -42,6 +40,12 @@ function TabHistory(){
 		return true;
 	};
 	
+	var sortbyindex = function(val1,val2){
+		if(!val1.windowId || !val2.windowId) return val1.id-val2.id;
+		else if(val1.windowId==val2.windowId) return val1.index-val2.index;
+		else return val1.windowId-val2.windowId;
+	};
+	
 	//Public methods
 	this.contains = function(obj){
 		return !!this.data.find(function(val){
@@ -49,54 +53,50 @@ function TabHistory(){
 		});
 	};
 	
-	this.get = function(obj){
+	this.get = function(tabid){
+		return this.data.find(function(val){
+			return (val.id==tabid);
+		});
+	};
+	
+	this.getAll = function(obj){
 		return this.data.findAll(function(val){
 			return equals(val,obj);
 		});
 	};
 	
 	this.set = function(obj){
-		var val = this.data.find(function(val){
-			return (val.id==obj.id);
-		});
-		if(val){
-			for(var prop in obj) val[prop] = obj[prop];}
-		else this.data.push(obj);
+		var val = this.get(obj.id);
+		if(!val){
+			obj.mode = obj.mode || 1;
+			this.data.push(obj);}
+		else for(var prop in obj) val[prop] = obj[prop];
+		this.data.sort(sortbyindex);
 	};
 	
 	this.update = function(list){
 		for(var i=0; i<list.length; i++){
-			var val = this.data.find(function(val){
-				return (val.id==list[i].id);
-			});
-			if(val){
-				if(val.status==1) val.url = list[i].url;
-				val.win = list[i].windowId;
-				val.pos = list[i].index;}
-			else this.data.push({
-					id: list[i].id,
-					url: list[i].url,
-					win: list[i].windowId,
-					pos: list[i].index,
-					status: 1
-				});}
-		this.data = this.data.sort(function(val1,val2){
-			if(!val1.win || !val2.win) return val1.id-val2.id;
-			else if(val1.win!=val2.win) return val1.win-val2.win;
-			else return val1.pos-val2.pos;
-		});
+			var obj = list[i];
+			if(obj.id!=browser.tabs.TAB_ID_NONE){
+				var val = this.get(obj.id);
+				if(!val){
+					obj.mode = obj.mode || 1;
+					this.data.push(obj);}
+				else for(var prop in obj){
+					if(val.mode==1 || prop!="url") val[prop] = obj[prop];}}}
+		this.data.sort(sortbyindex);
 	};
 	
 	this.remove = function(tabid){
-		return this.data.removeIf(function(val){
+		this.data.removeIf(function(val){
 			return (val.id==tabid);
 		});
 	};
 	
 	this.clear = function(tabid){
 		this.data.removeIf(function(val){
-			if(val.status==2) browser.tabs.remove(val.id);
-			return (val.status==2 || val.status==3);
+			if(val.mode==2) browser.tabs.remove(val.id);
+			return (val.mode==2 || val.mode==3);
 		});
 	};
 }
@@ -121,10 +121,9 @@ function PortConnect(){
 	};
 	
 	this.send = function(namelist){
-		var list = this.data.findAll(function(val){
-			return namelist.contains(val.port.name);
+		this.data.forEach(function(val){
+			if(namelist.contains(val.port.name)) val.port.postMessage(val.msgpost());
 		});
-		for(var i=0; i<list.length; i++) list[i].port.postMessage(list[i].msgpost());
 	};
 }
 
@@ -133,6 +132,8 @@ function Settings(){
 	this.mode = 1;
 	this.options = {};
 	this.tab = null;
+	this.focus = false;
+	this.sync = false;
 	var self = this;
 	var timeout = null;
 	
@@ -149,30 +150,37 @@ function Settings(){
 	//Private methods
 	var createtab = function(tab){
 		self.tab = tab;
-		if(browser.windows) browser.windows.onFocusChanged.addListener(focuswin);
+		if(!android) browser.windows.onFocusChanged.addListener(focuswin);
 		browser.tabs.onActivated.addListener(focustab);
 		browser.tabs.onMoved.addListener(movetab);
+		browser.tabs.onAttached.addListener(movetab);
 		browser.tabs.onRemoved.addListener(removetab);
 	};
 	
 	var focuswin = function(winid){
-		if(self.tab && self.tab.active && self.tab.windowId==winid) self.update();
+		self.focus = (self.tab.active && self.tab.windowId==winid);
+		if(self.sync) self.send();
 	};
 	
 	var focustab = function(info){
-		if(self.tab && self.tab.id==info.tabId) self.update();
+		self.focus = self.tab.active = (self.tab.id==info.tabId);
+		if(self.sync) self.send();
 	};
 	
-	var movetab = function(tabid){
-		if(self.tab && self.tab.id==tabid) self.update();
+	var movetab = function(tabid,info){
+		if(self.tab.id==tabid){
+			self.tab.windowId = info.newWindowId || self.tab.windowId;
+			self.tab.index = info.toIndex || info.newPosition;
+			self.focus = true;}
 	};
 	
 	var removetab = function(tabid){
-		if(self.tab && self.tab.id==tabid){
+		if(self.tab.id==tabid){
 			self.tab = null;
-			if(browser.windows) browser.windows.onFocusChanged.removeListener(focuswin);
+			if(!android) browser.windows.onFocusChanged.removeListener(focuswin);
 			browser.tabs.onActivated.removeListener(focustab);
 			browser.tabs.onMoved.removeListener(movetab);
+			browser.tabs.onAttached.removeListener(movetab);
 			browser.tabs.onRemoved.removeListener(removetab);}
 	};
 	
@@ -190,34 +198,36 @@ function Settings(){
 	
 	this.open = function(){
 		if(this.tab){
-			if(browser.windows) browser.windows.update(this.tab.windowId,{focused: true});
+			if(!android) browser.windows.update(this.tab.windowId,{focused: true});
 			browser.tabs.update(this.tab.id,{active: true});}
-		else browser.tabs.create({url: "/settings/index.html", active: true},createtab);
+		else if(android) //Firefox Android issue with browserAction popup and Settings page
+			browser.tabs.query({},function(tabs){
+				browser.tabs.create({url: "/settings/index.html", index: tabs.length-1},createtab);
+			});
+		else browser.tabs.create({url: "/settings/index.html"},createtab);
 	};
 	
 	this.close = function(){
 		if(this.tab) browser.tabs.remove(this.tab.id);
 	};
 	
-	this.update = function(){
-		if(timeout) clearTimeout(timeout);
-		timeout = setTimeout(function(){
-			browser.tabs.query({},function(tabs){
-				tabhistory.update(tabs);
-				if(self.tab) settings.tab = tabs.find(function(val){
-					return (val.id==self.tab.id);
-				});
+	this.send = function(){
+		if(this.focus){
+			if(timeout) clearTimeout(timeout);
+			timeout = setTimeout(function(){
 				portcon.send(["popup","settings"]);
-			});
-			timeout = null;
-		},500);
+				self.sync = false;
+				timeout = null;
+			},200);}
+		else this.sync = true;
 	};
 }
 
 /* -------------------- Main Process -------------------- */
 
-//Chrome compatibility
+//Browser compatibility
 var browser = browser || chrome;
+var android = !browser.windows;
 
 //Global variables
 var tabhistory = new TabHistory();
@@ -230,40 +240,58 @@ browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
 	tabhistory.set({
 		id: info.tabId,
 		url: info.url,
-		status: settings.mode
+		mode: settings.mode
 	});
 	switch(settings.mode){
-	case 1 : //Do nothing
+	case 1 : //Normal Mode
 	break;
-	case 2 :
+	case 2 : //Confirm Mode
 		redirectconfirm(info);
 		updatebadge();
 	break;
-	case 3 :
+	case 3 : //Blocking Mode
 		closetab(info.tabId);
 		updatebadge();
 	break;}
+	settings.send();
 });
 
-//HTTP request
-browser.webRequest.onBeforeRequest.addListener(
-	function(info){
-		if(settings.tab && (!tabhistory.contains({id: info.tabId}) || tabhistory.contains({id: info.tabId, status: 1}))){
-			tabhistory.set({
-				id: info.tabId,
-				url: info.url,
-				status: 1
-			});
-			portcon.send(["popup","settings"]);}
-	},
-	{urls: ["<all_urls>"], types: ["main_frame"]}
-);
+//Tab open
+browser.tabs.onCreated.addListener(function(tab){
+	if(!tabhistory.get(tab.id)){
+		tabhistory.set(tab);
+		settings.send();}
+});
+
+//Tab update
+browser.tabs.onUpdated.addListener(function(tabid,info,tab){
+	if(tabhistory.contains({id: tabid, mode: 1})){
+		tabhistory.set(tab);
+		settings.send();}
+});
+
+//Tab move within a window
+browser.tabs.onMoved.addListener(function(tabid,info){
+	browser.tabs.query({},function(tabs){
+		tabhistory.update(tabs);
+		settings.send();
+	});
+	
+});
+
+//Tab move between windows
+browser.tabs.onAttached.addListener(function(tabid,info){
+	browser.tabs.query({},function(tabs){
+		tabhistory.update(tabs);
+		settings.send();
+	});
+});
 
 //Tab close
-browser.tabs.onRemoved.addListener(function(tabid){
-	if(tabhistory.contains({id: tabid, status: 1})) tabhistory.remove(tabid);
-	if(tabhistory.contains({id: tabid, status: 2})) tabhistory.set({id: tabid, status: 3});
-	portcon.send(["popup","settings"]);
+browser.tabs.onRemoved.addListener(function(tabid,info){
+	if(tabhistory.contains({id: tabid, mode: 1})) tabhistory.remove(tabid);
+	if(tabhistory.contains({id: tabid, mode: 2})) tabhistory.set({id: tabid, mode: 3});
+	settings.send();
 	updatebadge();
 });
 
@@ -273,32 +301,34 @@ browser.runtime.onConnect.addListener(function(port){
 	case "confirm" : confirmcon(port);
 	break;
 	case "popup" :
-	case "settings" :
-		browser.tabs.query({},function(tabs){
-			tabhistory.update(tabs);
-			settingscon(port);
-		});
+	case "settings" : settingscon(port);
 	break;}
 });
 
 /* -------------------- Functions -------------------- */
 
 //Redirects to confirm page
+//Note: info.windowId not supported by Chrome
 function redirectconfirm(info){
 	var url = "/confirm/index.html#"+info.tabId;
 	switch(settings.options.popupfocus){
 	case 1 : browser.tabs.update(info.tabId,{url: url});
 	break;
-	case 2 :
+	case 2 : //Background focus
 		browser.tabs.update(info.tabId,{url: url, active: false});
-		if(browser.windows)
+		if(!android)
 			browser.tabs.get(info.sourceTabId,function(tab){
 				browser.windows.update(tab.windowId,{focused: true});
 			});
 		browser.tabs.update(info.sourceTabId,{active: true});
 	break;
-	case 3 :
-		if(browser.windows) browser.windows.update(info.windowId,{focused: true});
+	case 3 : //Foreground focus
+		if(!android){
+			if(info.windowId) browser.windows.update(info.windowId,{focused: true});
+			//Chrome compatibility
+			else browser.tabs.get(info.tabId,function(tab){
+					browser.windows.update(tab.windowId,{focused: true});
+				});}
 		browser.tabs.update(info.tabId,{url: url, active: true});
 	break;}
 }
@@ -307,7 +337,7 @@ function redirectconfirm(info){
 //Note: about:config --> browser.tabs.closeWindowWithLastTab
 function closetab(tabid){
 	browser.tabs.get(tabid,function(tab){
-		if(browser.windows)
+		if(!android)
 			browser.windows.get(tab.windowId,{populate: true},function(window){
 				if(window.tabs.length<=1) browser.windows.remove(window.id);
 				else browser.tabs.remove(tab.id);
@@ -318,43 +348,41 @@ function closetab(tabid){
 
 //Updates browserAction icon (No Firefox Android support)
 function updateicon(mode){
-	if(browser.windows){
+	if(!android){
 		var icons = {
 			1: "/images/icon-normal.png",
 			2: "/images/icon-confirm.png",
 			3: "/images/icon-blocking.png"
 		};
-		var colors = {1: "", 2: "orange", 3: "red"};
+		var colors = {1: "green", 2: "orange", 3: "red"};
 		browser.browserAction.setIcon({path: icons[mode]});
 		browser.browserAction.setBadgeBackgroundColor({color: colors[mode]});}
 };
 
 //Updates browserAction badge (No Firefox Android support)
 function updatebadge(){
-	if(browser.windows){
+	if(!android){
 		if(settings.mode!=1){
-			var badge = (tabhistory.get({status: settings.mode}).length || "").toString();
+			var badge = (tabhistory.getAll({mode: settings.mode}).length || "").toString();
 			browser.browserAction.setBadgeText({text: badge});}
 		else browser.browserAction.setBadgeText({text: ""});}
 }
 
 //Connects to confirm script
 function confirmcon(port){
-	var tab = tabhistory.get({id: port.sender.tab.id})[0];
+	var tab = tabhistory.get(port.sender.tab.id);
 	portcon.connect({
 		port: port,
-		msgpost: function(){
-			return {tab: tab};
-		},
+		msgpost: function(){return {tab: tab}},
 		msgget: function(msg){
 			switch(msg.status){
 			case "open" :
-				tabhistory.set({id: tab.id, status: 1});
+				tabhistory.set({id: tab.id, mode: 1});
 				browser.tabs.update(tab.id,{url: tab.url});
 				updatebadge();
 			break;
 			case "close" :
-				tabhistory.set({id: tab.id, status: 3});
+				tabhistory.set({id: tab.id, mode: 3});
 				closetab(tab.id);
 			break;}
 		}
@@ -367,9 +395,9 @@ function settingscon(port){
 	portcon.connect({
 		port: port,
 		msgpost: function(){return {
-			opentabs: tabhistory.get({status: 1}),
-			confirmtabs: tabhistory.get({status: 2}),
-			closetabs: tabhistory.get({status: 3}),
+			opentabs: tabhistory.getAll({mode: 1}),
+			confirmtabs: tabhistory.getAll({mode: 2}),
+			closetabs: tabhistory.getAll({mode: 3}),
 			mode: settings.mode,
 			options: settings.options
 		}},
@@ -384,7 +412,7 @@ function settingscon(port){
 			case "options" : settings.setoptions(msg.options);
 			break;
 			case "open" :
-				tabhistory.set({id: msg.tab.id, status: 1});
+				tabhistory.set({id: msg.tab.id, mode: 1});
 				browser.tabs.update(msg.tab.id,{url: msg.tab.url});
 				updatebadge();
 			break;

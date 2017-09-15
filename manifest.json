@@ -1,14 +1,13 @@
 {
 	"manifest_version": 2,
 	"name": "PopupFilter",
-	"version": "1.3",
+	"version": "1.4",
 	"author": "Baptiste Thémine",
 	
 	"description": "Prevents intempestive opening of popups from website scripts.",
 	
 	"permissions": [
 		"webNavigation",
-		"webRequest",
 		"<all_urls>",
 		"storage",
 		"tabs"

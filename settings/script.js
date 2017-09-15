@@ -1,7 +1,8 @@
 /* -------------------- Main Process -------------------- */
 
-//Chrome compatibility
+//Browser compatibility
 var browser = browser || chrome;
+var android = !browser.windows;
 
 //Global variables
 var port = browser.runtime.Port;
@@ -15,9 +16,9 @@ window.onload = function(){
 		document.getElementById("nbopen").textContent = msg.opentabs.length;
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
-		tabstohtml(document.getElementById("opentabs"),msg.opentabs,[closebtn]);
-		tabstohtml(document.getElementById("confirmtabs"),msg.confirmtabs,[openbtn,closebtn]);
-		tabstohtml(document.getElementById("closetabs"),msg.closetabs,[restorebtn]);
+		tabstohtml("opentabs",msg.opentabs,[closebtn]);
+		tabstohtml("confirmtabs",msg.confirmtabs,[openbtn,closebtn]);
+		tabstohtml("closetabs",msg.closetabs,[restorebtn]);
 		document.getElementById("mode"+msg.mode).checked = true;
 		document.getElementById("popupfocus"+msg.options.popupfocus).checked = true;
 		seticon(msg.mode);
@@ -95,7 +96,8 @@ var restorebtn = function(tab){
 };
 
 //Converts tab list to html into table
-function tabstohtml(table,tablist,actionbtn){
+function tabstohtml(target,tablist,actionbtn){
+	var table = document.getElementById(target);
 	table.innerHTML = "";
 	for(var i=0; i<tablist.length; i++){
 		let tab = tablist[i];
@@ -104,7 +106,7 @@ function tabstohtml(table,tablist,actionbtn){
 		col.title = tab.url;
 		col.textContent = tab.url;
 		col.ondblclick = function(){
-			if(browser.windows) browser.windows.update(tab.win,{focused: true});
+			if(!android) browser.windows.update(tab.windowId,{focused: true});
 			browser.tabs.update(tab.id,{active: true});
 		};
 		row.appendChild(col);

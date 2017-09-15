@@ -1,7 +1,8 @@
 /* -------------------- Main Process -------------------- */
 
-//Chrome compatibility
+//Browser compatibility
 var browser = browser || chrome;
+var android = !browser.windows;
 
 //Global variables
 var port = browser.runtime.Port;

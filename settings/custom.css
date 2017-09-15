@@ -19,12 +19,6 @@ content {
 	display: block;
 	max-width: 800rem;
 	margin: auto;
-	animation: fadein 1s;
-}
-
-@keyframes fadein {
-	from{opacity: 0;}
-	to{opacity: 1;}
 }
 
 h1 {
