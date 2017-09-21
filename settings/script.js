@@ -96,7 +96,7 @@ var restorebtn = function(tab){
 };
 
 //Converts tab list to html into table
-function tabstohtml(target,tablist,actionbtn){
+function tabstohtml(target,tablist,actionbtns = []){
 	var table = document.getElementById(target);
 	table.innerHTML = "";
 	for(var i=0; i<tablist.length; i++){
@@ -111,7 +111,7 @@ function tabstohtml(target,tablist,actionbtn){
 		};
 		row.appendChild(col);
 		col = document.createElement("td");
-		for(var j=0; j<actionbtn.length; j++) col.appendChild(actionbtn[j](tablist[i]));
+		actionbtns.forEach(function(button){col.appendChild(button(tab))});
 		row.appendChild(col);
 		table.appendChild(row);}
 }

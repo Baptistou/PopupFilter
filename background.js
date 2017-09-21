@@ -41,8 +41,7 @@ function TabHistory(){
 	};
 	
 	var sortbyindex = function(val1,val2){
-		if(!val1.windowId || !val2.windowId) return val1.id-val2.id;
-		else if(val1.windowId==val2.windowId) return val1.index-val2.index;
+		if(val1.windowId==val2.windowId) return val1.index-val2.index;
 		else return val1.windowId-val2.windowId;
 	};
 	
@@ -200,11 +199,9 @@ function Settings(){
 		if(this.tab){
 			if(!android) browser.windows.update(this.tab.windowId,{focused: true});
 			browser.tabs.update(this.tab.id,{active: true});}
-		else if(android) //Firefox Android issue with browserAction popup and Settings page
-			browser.tabs.query({},function(tabs){
-				browser.tabs.create({url: "/settings/index.html", index: tabs.length-1},createtab);
-			});
 		else browser.tabs.create({url: "/settings/index.html"},createtab);
+		//Firefox Android issue with browserAction popup and Settings page
+		setTimeout(function(){browser.tabs.update(self.tab.id,{active: true})},500);
 	};
 	
 	this.close = function(){
@@ -234,26 +231,28 @@ var tabhistory = new TabHistory();
 var portcon = new PortConnect();
 var settings = new Settings();
 
-//Tab creation
+//Popup open
 //Note: Firefox Android not firing with links
+//Note: Chrome doesn't support info.windowId
 browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
-	tabhistory.set({
-		id: info.tabId,
-		url: info.url,
-		mode: settings.mode
+	browser.tabs.get(info.tabId,function(tab){
+		info.windowId = info.windowId || tab.windowId;
+		tab.url = info.url;
+		tab.mode = settings.mode;
+		tabhistory.set(tab);
+		switch(settings.mode){
+		case 1 : //Normal Mode
+		break;
+		case 2 : //Confirm Mode
+			redirectconfirm(info);
+			updatebadge();
+		break;
+		case 3 : //Blocking Mode
+			closetab(tab);
+			updatebadge();
+		break;}
+		settings.send();
 	});
-	switch(settings.mode){
-	case 1 : //Normal Mode
-	break;
-	case 2 : //Confirm Mode
-		redirectconfirm(info);
-		updatebadge();
-	break;
-	case 3 : //Blocking Mode
-		closetab(info.tabId);
-		updatebadge();
-	break;}
-	settings.send();
 });
 
 //Tab open
@@ -308,42 +307,32 @@ browser.runtime.onConnect.addListener(function(port){
 /* -------------------- Functions -------------------- */
 
 //Redirects to confirm page
-//Note: info.windowId not supported by Chrome
 function redirectconfirm(info){
 	var url = "/confirm/index.html#"+info.tabId;
 	switch(settings.options.popupfocus){
-	case 1 : browser.tabs.update(info.tabId,{url: url});
+	case 1 : //Default focus
+		browser.tabs.update(info.tabId,{url: url});
 	break;
 	case 2 : //Background focus
 		browser.tabs.update(info.tabId,{url: url, active: false});
-		if(!android)
-			browser.tabs.get(info.sourceTabId,function(tab){
-				browser.windows.update(tab.windowId,{focused: true});
-			});
+		if(!android) browser.windows.update(tabhistory.get(info.sourceTabId).windowId,{focused: true});
 		browser.tabs.update(info.sourceTabId,{active: true});
 	break;
 	case 3 : //Foreground focus
-		if(!android){
-			if(info.windowId) browser.windows.update(info.windowId,{focused: true});
-			//Chrome compatibility
-			else browser.tabs.get(info.tabId,function(tab){
-					browser.windows.update(tab.windowId,{focused: true});
-				});}
+		if(!android) browser.windows.update(info.windowId,{focused: true});
 		browser.tabs.update(info.tabId,{url: url, active: true});
 	break;}
 }
 
 //Closes specified tab and its window
 //Note: about:config --> browser.tabs.closeWindowWithLastTab
-function closetab(tabid){
-	browser.tabs.get(tabid,function(tab){
-		if(!android)
-			browser.windows.get(tab.windowId,{populate: true},function(window){
-				if(window.tabs.length<=1) browser.windows.remove(window.id);
-				else browser.tabs.remove(tab.id);
-			});
-		else browser.tabs.remove(tab.id);
-	});
+function closetab(tab){
+	if(!android)
+		browser.windows.get(tab.windowId,{populate: true},function(window){
+			if(window.tabs.length<=1) browser.windows.remove(window.id);
+			else browser.tabs.remove(tab.id);
+		});
+	else browser.tabs.remove(tab.id);
 }
 
 //Updates browserAction icon (No Firefox Android support)
@@ -383,7 +372,7 @@ function confirmcon(port){
 			break;
 			case "close" :
 				tabhistory.set({id: tab.id, mode: 3});
-				closetab(tab.id);
+				closetab(tab);
 			break;}
 		}
 	});
@@ -416,7 +405,7 @@ function settingscon(port){
 				browser.tabs.update(msg.tab.id,{url: msg.tab.url});
 				updatebadge();
 			break;
-			case "close" : closetab(msg.tab.id);
+			case "close" : closetab(msg.tab);
 			break;
 			case "restore" :
 				tabhistory.remove(msg.tab.id);

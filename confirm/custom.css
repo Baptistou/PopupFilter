@@ -48,6 +48,8 @@ textarea {
 	width: 100%;
 	margin: 20rem 0;
 	text-align: left;
+	word-wrap: break-word;
+	word-break: break-all;
 	resize: none;
 }
 
