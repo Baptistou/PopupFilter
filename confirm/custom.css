@@ -10,6 +10,7 @@ html {
 }
 
 body {
+	margin: 0;
 	font-size: 20rem;
 	background-image: url(/images/space.jpg);
 }

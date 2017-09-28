@@ -11,87 +11,117 @@
 		<link rel="stylesheet" type="text/css" href="custom.css">
 		
 		<!-- JAVASCRIPT -->
+		<script type="text/javascript" src="/functions.js"></script>
 		<script type="text/javascript" src="script.js"></script>
     </head>
 	
     <body>
-		<content>
+		<!-- HEADER -->
+		<header>
 			<h1 class="center">
 				<img class="middle" id="icon" src="/images/icon48.png">
 				<span class="middle">PopupFilter</span>
 			</h1>
+		</header>
+		
+		<!-- NAVIGATION BAR -->
+		<nav>
+			<a class="active" id="nav-overview">Overview</a>
+			<a id="nav-settings">Settings</a>
+		</nav>
+		
+		<!-- CONTENT -->
+		<content>
+			<!-- TAB LIST OVERVIEW -->
+			<section id="overview">
+				<dl class="accordion">
+					<dt class="active">
+						<span class="text">Open tabs (<span id="nbopen">0</span>)</span>
+						<span class="icon"></span>
+					</dt>
+					<dd>
+						<table class="tablist" id="opentabs"></table>
+						<div class="msgbox">No tabs</div>
+					</dd>
+					<dt class="active">
+						<span class="text">On hold tabs (<span id="nbconfirm">0</span>)</span>
+						<span class="icon"></span>
+					</dt>
+					<dd>
+						<table class="tablist" id="confirmtabs"></table>
+						<div class="msgbox">No tabs</div>
+					</dd>
+					<dt class="active">
+						<span class="text">Blocked tabs (<span id="nbclose">0</span>)</span>
+						<span class="icon"></span>
+					</dt>
+					<dd>
+						<table class="tablist" id="closetabs"></table>
+						<div class="msgbox">No tabs</div>
+					</dd>
+				</dl>
+			</section>
 			
-			<!-- TAB LISTS -->
-			<dl class="accordion">
-				<dt class="active">
-					<span class="text">Open tabs (<span id="nbopen">0</span>)</span>
-					<span class="icon"></span>
-				</dt>
-				<dd>
-					<table class="tablist" id="opentabs"></table>
-					<div class="msgbox">No tabs</div>
-				</dd>
-				<dt class="active">
-					<span class="text">On hold tabs (<span id="nbconfirm">0</span>)</span>
-					<span class="icon"></span>
-				</dt>
-				<dd>
-					<table class="tablist" id="confirmtabs"></table>
-					<div class="msgbox">No tabs</div>
-				</dd>
-				<dt class="active">
-					<span class="text">Blocked tabs (<span id="nbclose">0</span>)</span>
-					<span class="icon"></span>
-				</dt>
-				<dd>
-					<table class="tablist" id="closetabs"></table>
-					<div class="msgbox">No tabs</div>
-				</dd>
-			</dl>
-			
-			<!-- MODES -->
-			<div class="setting">
-				<h2>Modes</h2>
-				<ul class="optionlist-v">
-					<li>
-						<input type="radio" name="mode" id="mode1" value="1">
-						<label for="mode1">Normal Mode : Allow the opening of new tabs and new windows.</label>
-					</li>
-					<li>
-						<input type="radio" name="mode" id="mode2" value="2">
-						<label for="mode2">Confirm Mode : Ask before opening and displaying content of new tabs/windows.</label>
-					</li>
-					<li>
-						<input type="radio" name="mode" id="mode3" value="3">
-						<label for="mode3">Blocking Mode : Block all new tabs/windows opened by links or scripts.</label>
-					</li>
-				</ul>
-			</div>
-			
-			<!-- OPTIONS -->
-			<div class="setting">
-				<h2>Options</h2>
-				<p>In Confirm Mode, the new tabs/windows must be opened in :</p>
-				<ul class="optionlist-h">
-					<li>
-						<input type="radio" name="popupfocus" id="popupfocus1" value="1">
-						<label for="popupfocus1">Default</label>
-					</li>
-					<li>
-						<input type="radio" name="popupfocus" id="popupfocus2" value="2">
-						<label for="popupfocus2">Background</label>
-					</li>
-					<li>
-						<input type="radio" name="popupfocus" id="popupfocus3" value="3">
-						<label for="popupfocus3">Foreground</label>
-					</li>
-				</ul>
-			</div>
-			
-			<p class="center">
-				<button class="button" id="clear">Clear History</button>
-				<button class="button" id="close">Close</button>
-			</p>
+			<!-- SETTINGS -->
+			<section class="hidden" id="settings">
+				<!-- ABOUT -->
+				<div class="setting-block">
+					<h2>About</h2>
+					<p>PopupFilter version <span id="version"></span> by Baptiste Thémine.</p>
+					<p>
+						If you like this add-on or have some ideas to improve it, please send a comment on
+						<a href="https://addons.mozilla.org/fr/firefox/addon/popupfilteraddon">AMO</a>.<br>
+						If you encountered any issue, please report it on
+						<a href="https://github.com/Baptistou/PopupFilter">GitHub</a>.
+					</p>
+					<p>Thank you for downloading PopupFilter.</p>
+				</div>
+				
+				<!-- MODES -->
+				<div class="setting-block">
+					<h2>Modes</h2>
+					<ul class="optionlist-v">
+						<li>
+							<input type="radio" name="mode" id="mode1" value="1">
+							<label for="mode1">Normal Mode : Allow the opening of new tabs and new windows.</label>
+						</li>
+						<li>
+							<input type="radio" name="mode" id="mode2" value="2">
+							<label for="mode2">Confirm Mode : Ask before opening and displaying content of new tabs/windows.</label>
+						</li>
+						<li>
+							<input type="radio" name="mode" id="mode3" value="3">
+							<label for="mode3">Blocking Mode : Block all new tabs/windows opened by links or scripts.</label>
+						</li>
+					</ul>
+				</div>
+				
+				<!-- OPTIONS -->
+				<div class="setting-block">
+					<h2>Options</h2>
+					<p>In Confirm Mode, the new tabs/windows must be opened in :</p>
+					<ul class="optionlist-h">
+						<li>
+							<input type="radio" name="popupfocus" id="popupfocus1" value="1">
+							<label for="popupfocus1">Default</label>
+						</li>
+						<li>
+							<input type="radio" name="popupfocus" id="popupfocus2" value="2">
+							<label for="popupfocus2">Background</label>
+						</li>
+						<li>
+							<input type="radio" name="popupfocus" id="popupfocus3" value="3">
+							<label for="popupfocus3">Foreground</label>
+						</li>
+					</ul>
+				</div>
+			</section>
 		</content>
+		
+		<!-- FOOTER -->
+		<footer>
+			<button class="button" id="clear">Clear History</button>
+			<button class="button" id="close">Close</button>
+		</footer>
 	</body>
 </html>

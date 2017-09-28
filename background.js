@@ -1,26 +1,3 @@
-/* -------------------- Prototypes -------------------- */
-
-//Returns true if array contains val
-Array.prototype.contains = function(val){
-	return (this.indexOf(val)>=0);
-};
-
-//Returns element list contained into array
-Array.prototype.findAll = function(callback){
-	var list = [];
-	for(var i=0; i<this.length; i++){
-		if(callback(this[i])) list.push(this[i]);}
-	return list;
-};
-
-//Removes element if condition is true
-Array.prototype.removeIf = function(callback){
-	var list = [];
-	for(var i=0; i<this.length; i++){
-		if(callback(this[i])) list.push(this.splice(i--,1)[0]);}
-	return list;
-};
-
 /* -------------------- Classes -------------------- */
 
 function TabHistory(){
@@ -162,7 +139,8 @@ function Settings(){
 	};
 	
 	var focustab = function(info){
-		self.focus = self.tab.active = (self.tab.id==info.tabId);
+		self.focus = self.tab.active = (self.tab.id==info.tabId
+			|| self.tab.windowId!=info.windowId && self.tab.active);
 		if(self.sync) self.send();
 	};
 	
@@ -201,7 +179,7 @@ function Settings(){
 			browser.tabs.update(this.tab.id,{active: true});}
 		else browser.tabs.create({url: "/settings/index.html"},createtab);
 		//Firefox Android issue with browserAction popup and Settings page
-		setTimeout(function(){browser.tabs.update(self.tab.id,{active: true})},500);
+		if(android) setTimeout(function(){browser.tabs.update(self.tab.id,{active: true})},500);
 	};
 	
 	this.close = function(){

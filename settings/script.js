@@ -24,27 +24,40 @@ window.onload = function(){
 		seticon(msg.mode);
 	});
 	
+	//Shows sections
+	var showsection = function(){
+		var section = document.getElementById(this.id.replace("nav-",""));
+		hideElements(document.querySelectorAll("section"));
+		showElement(section);
+		removeClass(document.querySelector("nav a.active"),"active");
+		addClass(this,"active");
+	};
+	document.getElementById("nav-overview").onclick = showsection;
+	document.getElementById("nav-settings").onclick = showsection;
+	
 	//Accordion menu
 	var menu = document.querySelectorAll("dl.accordion>dt");
-	for(var i=0; i<menu.length; i++){
+	for(var i=0; i<menu.length; i++)
 		menu[i].onclick = function(){
 			this.className = (this.className=="")?"active":"";
 		};
-	}
+	
+	//About
+	document.getElementById("version").textContent = browser.runtime.getManifest().version;
 	
 	//Modes
 	var radiobox = document.getElementsByName("mode");
-	for(var i=0; i<radiobox.length; i++){
+	for(var i=0; i<radiobox.length; i++)
 		radiobox[i].onchange = function(){
 			port.postMessage({status: "mode", mode: parseInt(this.value)});
-		};}
+		};
 	
 	//Options
 	radiobox = document.getElementsByName("popupfocus");
-	for(var i=0; i<radiobox.length; i++){
+	for(var i=0; i<radiobox.length; i++)
 		radiobox[i].onchange = function(){
 			port.postMessage({status: "options", options: {popupfocus: parseInt(this.value)}});
-		};}
+		};
 	
 	//Clears history
 	document.getElementById("clear").onclick = function(){
