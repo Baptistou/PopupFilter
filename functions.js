@@ -27,16 +27,16 @@ String.prototype.removeAll = function(str){
 	return this.replaceAll(str,"");
 };
 
+//Returns true if array contains val
+Array.prototype.contains = function(val){
+	return (this.indexOf(val)>=0);
+};
+
 //Returns number of occurrences of val
 Array.prototype.occurrence = function(val){
 	var count=0, index=0;
 	while(index = this.indexOf(val,index)+1) count++;
 	return count;
-};
-
-//Returns true if array contains val
-Array.prototype.contains = function(val){
-	return (this.indexOf(val)>=0);
 };
 
 //Returns element list contained into array
@@ -47,22 +47,19 @@ Array.prototype.findAll = function(callback){
 	return list;
 };
 
-//Removes the first occurence of val
-Array.prototype.remove = function(val){
-	var index = this.indexOf(val);
+//Inserts value into array at specified index
+Array.prototype.insert = function(index,val){
+	this.splice(index,0,val);
+};
+
+//Removes first element that fulfills condition
+Array.prototype.remove = function(callback){
+	var index = this.findIndex(callback);
 	return (index>=0)?this.splice(index,1)[0]:null;
 };
 
-//Removes all occurences of val
-Array.prototype.removeAll = function(val){
-	var list = [];
-	for(var i=0; i<this.length; i++){
-		if(this[i]==val) list.push(this.splice(i--,1)[0]);}
-	return list;
-};
-
-//Removes element if condition is true
-Array.prototype.removeIf = function(callback){
+//Removes all elements that fulfill condition
+Array.prototype.removeAll = function(callback){
 	var list = [];
 	for(var i=0; i<this.length; i++){
 		if(callback(this[i])) list.push(this.splice(i--,1)[0]);}
