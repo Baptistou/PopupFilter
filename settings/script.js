@@ -21,7 +21,8 @@ window.onload = function(){
 		tabstohtml("closetabs",msg.closetabs,[restorebtn]);
 		document.getElementById("mode"+msg.mode).checked = true;
 		document.getElementById("popupfocus"+msg.options.popupfocus).checked = true;
-		seticon(msg.mode);
+		document.getElementById("showbadge"+(!msg.options.showbadge+1)).checked = true;
+		updateicon(msg.mode);
 	});
 	
 	//Shows sections
@@ -36,28 +37,33 @@ window.onload = function(){
 	document.getElementById("nav-settings").onclick = showsection;
 	
 	//Accordion menu
-	var menu = document.querySelectorAll("dl.accordion>dt");
-	for(var i=0; i<menu.length; i++)
-		menu[i].onclick = function(){
-			this.className = (this.className=="")?"active":"";
-		};
+	document.querySelectorAll("dl.accordion>dt").forEach(function(item){
+		item.onclick = function(){this.className = (this.className)?"":"active";};
+	});
 	
 	//About
 	document.getElementById("version").textContent = browser.runtime.getManifest().version;
 	
 	//Modes
-	var radiobox = document.getElementsByName("mode");
-	for(var i=0; i<radiobox.length; i++)
-		radiobox[i].onchange = function(){
+	document.getElementsByName("mode").forEach(function(radiobox){
+		radiobox.onchange = function(){
 			port.postMessage({status: "mode", mode: parseInt(this.value)});
 		};
+	});
 	
 	//Options
-	radiobox = document.getElementsByName("popupfocus");
-	for(var i=0; i<radiobox.length; i++)
-		radiobox[i].onchange = function(){
+	document.getElementsByName("popupfocus").forEach(function(radiobox){
+		radiobox.onchange = function(){
 			port.postMessage({status: "options", options: {popupfocus: parseInt(this.value)}});
 		};
+	});
+	document.getElementsByName("showbadge").forEach(function(radiobox){
+		if(!android)
+			radiobox.onchange = function(){
+				port.postMessage({status: "options", options: {showbadge: (this.value=="true")}});
+			};
+		else radiobox.disabled = true;
+	});
 	
 	//Clears history
 	document.getElementById("clear").onclick = function(){
@@ -112,25 +118,29 @@ var restorebtn = function(tab){
 function tabstohtml(target,tablist,actionbtns = []){
 	var table = document.getElementById(target);
 	table.innerHTML = "";
-	for(var i=0; i<tablist.length; i++){
-		let tab = tablist[i];
+	tablist.forEach(function(tab){
 		var row = document.createElement("tr");
 		var col = document.createElement("td");
+		if(tab.favIconUrl){
+			var img = document.createElement("img");
+			img.className = "image top";
+			img.src = tab.favIconUrl;
+			col.appendChild(img);}
+		row.appendChild(col);
+		col = document.createElement("td");
 		col.title = tab.url;
 		col.textContent = tab.url;
-		col.ondblclick = function(){
-			if(!android) browser.windows.update(tab.windowId,{focused: true});
-			browser.tabs.update(tab.id,{active: true});
-		};
+		col.ondblclick = function(){focustab(tab)};
 		row.appendChild(col);
 		col = document.createElement("td");
 		actionbtns.forEach(function(button){col.appendChild(button(tab))});
 		row.appendChild(col);
-		table.appendChild(row);}
+		table.appendChild(row);
+	});
 }
 
 //Changes icon according to mode
-function seticon(mode){
+function updateicon(mode){
 	var icons = {
 		1: "/images/icon-normal.png",
 		2: "/images/icon-confirm.png",

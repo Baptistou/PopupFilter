@@ -133,3 +133,22 @@ function removeElement(target){
 function removeElements(list){
 	for(var i=0; i<list.length; i++) list[i].parentNode.removeChild(list[i]);
 }
+
+/* -------------------- WebExtensions -------------------- */
+
+//Focuses specified tab
+function focustab(tab){
+	if(!android) browser.windows.update(tab.windowId,{focused: true});
+	browser.tabs.update(tab.id,{active: true});
+}
+
+//Closes specified tab and its window
+//Note: about:config --> browser.tabs.closeWindowWithLastTab
+function closetab(tab){
+	if(!android)
+		browser.tabs.query({windowId: tab.windowId},function(tabs){
+			if(tabs.length>1) browser.tabs.remove(tab.id);
+			else if(tabs[0].id==tab.id) browser.windows.remove(tab.windowId);
+		});
+	else browser.tabs.remove(tab.id);
+}

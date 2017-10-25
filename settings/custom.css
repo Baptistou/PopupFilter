@@ -10,6 +10,14 @@ html {
 	font-size: 1px;
 }
 
+@media screen and (orientation: landscape) {
+	html {font-size: 0.15vh;}
+}
+
+@media screen and (orientation: portrait) {
+	html {font-size: 0.22vw;}
+}
+
 body {
 	margin: 0;
 	font-size: 18rem;
@@ -90,6 +98,12 @@ p {
 .button::-moz-focus-inner {
     padding: 0;
 	border: 0;
+}
+
+img.image {
+	display: inline-block;
+	width: 300rem;
+	max-width: 100%;
 }
 
 /* -------------------- Navigation bar -------------------- */
@@ -216,14 +230,19 @@ table.tablist>tr {
 	border-top: 1rem solid #E0E0E0;
 }
 
-table.tablist>tr>td:first-child {
+table.tablist>tr>td:nth-child(1) {
+	width: 35rem;
+	padding: 5rem;
+}
+
+table.tablist>tr>td:nth-child(2) {
 	padding: 5rem;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-table.tablist>tr>td:last-child {
+table.tablist>tr>td:nth-child(3) {
 	width: 65rem;
 	padding: 0 8rem 0 8rem;
 	text-align: right;
@@ -324,6 +343,10 @@ ul.optionlist-h>li {
 
 ul.optionlist-h>li:hover {
 	background-color: #E0E0E0;
+}
+
+input:disabled+label {
+	color: #888888;
 }
 
 /* -------------------- Footer -------------------- */
