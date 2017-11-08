@@ -1,4 +1,4 @@
-﻿PopupFilter version 1.8 by Baptiste Thémine
+﻿PopupFilter version 1.9 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
 
@@ -15,7 +15,7 @@ The main advantage and difference of PopupFilter is that it works without any bl
 
 --------------------------------------------------------------------------------
 
-PopupFilter version 1.8 par Baptiste Thémine
+PopupFilter version 1.9 par Baptiste Thémine
 
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
 
@@ -33,6 +33,16 @@ Le principal avantage et la principale différence de PopupFilter est qu'il ne f
 --------------------------------------------------------------------------------
 
 PopupFilter updates :
+* version 1.9 (08/11/2017)
+- Fix issue with browser.runtime.port.onDisconnect event not firing for browserAction popup when window is closed.
+- Fix issue with browserAction.setBadgeBackgroundColor on Chrome.
+- Fix issue with Tab.favIconUrl not supported on Firefox Android.
+- Fix issue with tab count badge not updating in some case.
+- Add blocking web requests for popups to improve browser safety.
+- Add current mode to browserAction title for better visibility on Firefox Android.
+- Modify the appearance of browserAction popup.
+- Code and performance improvements.
+
 * version 1.8 (25/10/2017)
 - Fix issue with closetab function which could close browser window when new tab popups close automatically on Firefox.
 - Add a new option in Settings page that permits to show/hide tab count badge in the browserAction button (no Firefox Android support).
@@ -69,9 +79,9 @@ PopupFilter updates :
 - Code and performance improvements.
 
 * version 1.2 (05/09/2017)
-- PopupFilter icon improvements such as dynamic change on browserAction popup and settings page.
 - Fix compatibility issue with browser.windows API on Firefox Android.
 - Fix compatibility issue with browser.browserAction API on Firefox Android.
+- PopupFilter icon improvements such as dynamic change on browserAction popup and settings page.
 
 * version 1.1 (03/09/2017)
 - Add new icons according to PopupFilter modes and add badge on toolbar.

@@ -11,13 +11,12 @@ html {
 }
 
 body {
-	padding: 10rem;
-	font-size: 18rem;
+	padding: 5rem;
+	font-size: 20rem;
 }
 
 content {
-	display: block;
-	max-width: 400rem;
+	display: table;
 	margin: auto;
 }
 
@@ -61,11 +60,22 @@ p {
 
 /* -------------------- Content -------------------- */
 
+table.tabstatus {
+	display: table;
+	table-layout: fixed;
+	width: 250rem;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+table.tabstatus>tbody>tr>td {
+	border: 1px solid #E0E0E0;
+}
+
 ul.optionlist {
 	display: block;
 	margin: 10rem 0 10rem 0;
-	padding: 10rem 0 0 0;
-	border-top: 1rem solid #E0E0E0;
+	padding: 0;
 	list-style: none;
 }
 

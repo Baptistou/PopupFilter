@@ -11,9 +11,9 @@ function TabHistory(){
 	});
 	
 	//Private methods
-	var objcontains = function(val,obj){
-		for(var prop in obj){
-			if(val[prop]!=obj[prop]) return false;}
+	var objcontains = function(obj1,obj2){
+		for(var prop in obj2){
+			if(obj1[prop]!=obj2[prop]) return false;}
 		return true;
 	};
 	
@@ -25,7 +25,7 @@ function TabHistory(){
 	};
 	
 	this.getAll = function(obj){
-		return this.data.findAll(function(val){
+		return this.data.filter(function(val){
 			return objcontains(val,obj);
 		});
 	};
@@ -39,15 +39,15 @@ function TabHistory(){
 	};
 	
 	this.update = function(list){
-		for(var i=0; i<list.length; i++){
-			var obj = list[i];
+		list.forEach(function(obj){
 			if(obj.id!=browser.tabs.TAB_ID_NONE){
-				var val = this.get(obj.id);
+				var val = self.get(obj.id);
 				if(!val){
 					obj.mode = obj.mode || 1;
-					this.data.push(obj);}
+					self.data.push(obj);}
 				else for(var prop in obj){
-					if(val.mode==1 || prop!="url") val[prop] = obj[prop];}}}
+					if(val.mode==1 || prop!="url") val[prop] = obj[prop];}}
+		});
 	};
 	
 	this.remove = function(tabid){
@@ -84,8 +84,12 @@ function PortConnect(){
 	};
 	
 	this.send = function(namelist){
-		this.data.forEach(function(val){
-			if(namelist.contains(val.port.name)) val.port.postMessage(val.msgpost());
+		this.data.removeAll(function(val){
+			try{
+				if(namelist.contains(val.port.name)) val.port.postMessage(val.msgpost());
+				return false;}
+			catch(error){
+				return true;}
 		});
 	};
 }
@@ -194,15 +198,15 @@ function Settings(){
 	//Updates browserAction icon
 	//Note: No Firefox Android support
 	this.updateicon = function(){
+		var actionbtn = {
+			1: {title: "Normal", icon: "icon-normal.png", color: "#32BC10"},
+			2: {title: "Confirm", icon: "icon-confirm.png", color: "orange"},
+			3: {title: "Blocking", icon: "icon-blocking.png", color: "red"}
+		};
+		browser.browserAction.setTitle({title: "PopupFilter ("+actionbtn[this.mode].title+")"});
 		if(!android){
-			var icons = {
-				1: "/images/icon-normal.png",
-				2: "/images/icon-confirm.png",
-				3: "/images/icon-blocking.png"
-			};
-			var colors = {1: "#32BC10", 2: "orange", 3: "red"};
-			browser.browserAction.setIcon({path: icons[this.mode]});
-			browser.browserAction.setBadgeBackgroundColor({color: colors[this.mode]});}
+			browser.browserAction.setIcon({path: "/images/"+actionbtn[this.mode].icon});
+			browser.browserAction.setBadgeBackgroundColor({color: actionbtn[this.mode].color});}
 	};
 	
 	//Updates browserAction badge
@@ -226,17 +230,6 @@ var portcon = new PortConnect();
 var settings = new Settings();
 var syncpopup = [];
 
-//Popup open
-//Note: Firefox Android not firing with links
-//Note: Chrome doesn't support info.windowId
-browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
-	var tab = tabhistory.get(info.tabId);
-	if(tab){
-		preventpopup(tab,info);
-		settings.send();}
-	else syncpopup.push(info);
-});
-
 //Tab open
 //Note: Firefox not firing on previous session restore
 browser.tabs.onCreated.addListener(function(tab){
@@ -248,6 +241,28 @@ browser.tabs.onCreated.addListener(function(tab){
 	settings.updatebadge();
 	settings.send();
 });
+
+//Popup open
+//Note: Firefox Android not firing with links
+//Note: Chrome doesn't support info.windowId
+browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
+	var tab = tabhistory.get(info.tabId);
+	if(tab){
+		preventpopup(tab,info);
+		settings.updatebadge();
+		settings.send();}
+	else syncpopup.push(info);
+});
+
+//Blocking web requests
+browser.webRequest.onBeforeRequest.addListener(
+	function(info){
+		var tab = tabhistory.get(info.tabId);
+		return {cancel: (tab && tab.mode==3)};
+	},
+	{urls: ["<all_urls>"], types: ["main_frame"]},
+	["blocking"]
+);
 
 //Tab update
 browser.tabs.onUpdated.addListener(function(tabid,info,tab){
@@ -279,6 +294,7 @@ browser.tabs.onRemoved.addListener(function(tabid,info){
 });
 
 //Script communication with content scripts
+//Note: Port.onDisconnect not triggered on window close on Firefox
 browser.runtime.onConnect.addListener(function(port){
 	switch(port.name){
 	case "confirm" : confirmcon(port);
@@ -335,7 +351,6 @@ function confirmcon(port){
 			case "open" :
 				tabhistory.set({id: tab.id, mode: 1});
 				browser.tabs.update(tab.id,{url: tab.url});
-				settings.updatebadge();
 			break;
 			case "close" :
 				tabhistory.set({id: tab.id, mode: 3});
@@ -377,14 +392,12 @@ function settingscon(port){
 			case "open" :
 				tabhistory.set({id: msg.tab.id, mode: 1});
 				browser.tabs.update(msg.tab.id,{url: msg.tab.url});
-				settings.updatebadge();
 			break;
 			case "close" : closetab(msg.tab);
 			break;
 			case "restore" :
 				tabhistory.remove(msg.tab.id);
 				browser.tabs.create({url: msg.tab.url, active: false});
-				settings.updatebadge();
 			break;
 			case "clear" :
 				tabhistory.clear();

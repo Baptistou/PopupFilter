@@ -35,7 +35,7 @@ window.onload = function(){
 };
 
 //Disconnects port
-window.onbeforeunload = function(){
+window.onunload = function(){
 	port.disconnect();
 };
 

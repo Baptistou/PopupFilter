@@ -20,11 +20,18 @@
 				<img class="middle" id="icon" src="/images/icon48.png">
 				<span class="middle">PopupFilter</span>
 			</h1>
-			<p>
-				Open tabs : <span id="nbopen">0</span><br>
-				Confirm tabs : <span id="nbconfirm">0</span><br>
-				Blocked tabs : <span id="nbclose">0</span>
-			</p>
+			<table class="tabstatus">
+				<tr>
+					<td>Open</td>
+					<td>Confirm</td>
+					<td>Blocked</td>
+				</tr>
+				<tr>
+					<td><span id="nbopen">0</span></td>
+					<td><span id="nbconfirm">0</span></td>
+					<td><span id="nbclose">0</span></td>
+				</tr>
+			</table>
 			<ul class="optionlist">
 				<li>
 					<input type="radio" name="mode" id="mode1" value="1">

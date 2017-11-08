@@ -79,7 +79,7 @@ window.onload = function(){
 };
 
 //Disconnects port
-window.onbeforeunload = function(){
+window.onunload = function(){
 	port.disconnect();
 };
 
@@ -115,6 +115,7 @@ var restorebtn = function(tab){
 };
 
 //Converts tab list to html into table
+//Note: Tab.favIconUrl not supported on Firefox Android
 function tabstohtml(target,tablist,actionbtns = []){
 	var table = document.getElementById(target);
 	table.innerHTML = "";
@@ -126,6 +127,7 @@ function tabstohtml(target,tablist,actionbtns = []){
 			img.className = "image top";
 			img.src = tab.favIconUrl;
 			col.appendChild(img);}
+		if(android) hideElement(col);
 		row.appendChild(col);
 		col = document.createElement("td");
 		col.title = tab.url;

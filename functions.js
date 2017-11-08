@@ -39,14 +39,6 @@ Array.prototype.occurrence = function(val){
 	return count;
 };
 
-//Returns element list contained into array
-Array.prototype.findAll = function(callback){
-	var list = [];
-	for(var i=0; i<this.length; i++){
-		if(callback(this[i])) list.push(this[i]);}
-	return list;
-};
-
 //Inserts value into array at specified index
 Array.prototype.insert = function(index,val){
 	this.splice(index,0,val);
@@ -62,7 +54,7 @@ Array.prototype.remove = function(callback){
 Array.prototype.removeAll = function(callback){
 	var list = [];
 	for(var i=0; i<this.length; i++){
-		if(callback(this[i])) list.push(this.splice(i--,1)[0]);}
+		if(callback(this[i],i,this)) list.push(this.splice(i--,1)[0]);}
 	return list;
 };
 
@@ -101,7 +93,7 @@ function showElement(target){
 
 //Shows element list
 function showElements(list){
-	for(var i=0; i<list.length; i++) removeClass(list[i],"hidden");
+	list.forEach(function(val){removeClass(val,"hidden")});
 }
 
 //Hides element
@@ -111,7 +103,7 @@ function hideElement(target){
 
 //Hides element list
 function hideElements(list){
-	for(var i=0; i<list.length; i++) addClass(list[i],"hidden");
+	list.forEach(function(val){addClass(val,"hidden")});
 }
 
 //Toggles element
@@ -121,7 +113,7 @@ function toggleElement(target){
 
 //Toggles element list
 function toggleElements(list){
-	for(var i=0; i<list.length; i++) toggleClass(list[i],"hidden");
+	list.forEach(function(val){toggleClass(val,"hidden")});
 }
 
 //Removes element
@@ -131,7 +123,7 @@ function removeElement(target){
 
 //Removes element list
 function removeElements(list){
-	for(var i=0; i<list.length; i++) list[i].parentNode.removeChild(list[i]);
+	list.forEach(function(val){val.parentNode.removeChild(val)});
 }
 
 /* -------------------- WebExtensions -------------------- */
@@ -147,8 +139,8 @@ function focustab(tab){
 function closetab(tab){
 	if(!android)
 		browser.tabs.query({windowId: tab.windowId},function(tabs){
-			if(tabs.length>1) browser.tabs.remove(tab.id);
-			else if(tabs[0].id==tab.id) browser.windows.remove(tab.windowId);
+			if(tabs.length==1 && tabs[0].id==tab.id) browser.windows.remove(tab.windowId);
+			else browser.tabs.remove(tab.id);
 		});
 	else browser.tabs.remove(tab.id);
 }

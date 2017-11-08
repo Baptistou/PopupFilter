@@ -1,16 +1,18 @@
 {
 	"manifest_version": 2,
 	"name": "PopupFilter",
-	"version": "1.8",
+	"version": "1.9",
 	"author": "Baptiste Thémine",
 	
 	"description": "Prevents intempestive opening of popups from website scripts.",
 	
 	"permissions": [
-		"webNavigation",
 		"<all_urls>",
 		"storage",
-		"tabs"
+		"tabs",
+		"webNavigation",
+		"webRequest",
+		"webRequestBlocking"
 	],
 	
 	"icons": {
@@ -27,7 +29,6 @@
 	"browser_action": {
 		"default_title": "PopupFilter",
 		"default_icon": "images/icon48.png",
-		"default_popup": "popup/index.html",
-		"browser_style": true
+		"default_popup": "popup/index.html"
 	}
 }
