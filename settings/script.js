@@ -1,9 +1,5 @@
 /* -------------------- Main Process -------------------- */
 
-//Browser compatibility
-var browser = browser || chrome;
-var android = !browser.windows;
-
 //Global variables
 var port = browser.runtime.Port;
 
@@ -42,7 +38,15 @@ window.onload = function(){
 	});
 	
 	//About
-	document.getElementById("version").textContent = browser.runtime.getManifest().version;
+	var manifest = browser.runtime.getManifest();
+	document.getElementById("version").textContent = manifest.version;
+	document.getElementById("author").textContent = manifest.author;
+	document.querySelectorAll("a.link").forEach(function(link){
+		link.onclick = function(event){
+			event.preventDefault();
+			browser.tabs.create({url: this.href});
+		};
+	});
 	
 	//Modes
 	document.getElementsByName("mode").forEach(function(radiobox){
@@ -58,19 +62,17 @@ window.onload = function(){
 		};
 	});
 	document.getElementsByName("showbadge").forEach(function(radiobox){
-		if(!android)
+		if(!ANDROID)
 			radiobox.onchange = function(){
 				port.postMessage({status: "options", options: {showbadge: (this.value=="true")}});
 			};
 		else radiobox.disabled = true;
 	});
 	
-	//Clears history
+	//Footer
 	document.getElementById("clear").onclick = function(){
 		port.postMessage({status: "clear"});
 	};
-	
-	//Closes settings page
 	document.getElementById("close").onclick = function(){
 		browser.tabs.getCurrent(function(tab){
 			browser.tabs.remove(tab.id);
@@ -114,24 +116,42 @@ var restorebtn = function(tab){
 	return button;
 };
 
-//Converts tab list to html into table
+//Counts and removes duplicate tabs
+function countduplicates(tab,i,list){
+	tab.count = 1;
+	var j = list.findIndex(val => (val.url==tab.url));
+	return (i==j || !list[j].count++);
+};
+
+//Gets tab favicon
 //Note: Tab.favIconUrl not supported on Firefox Android
-function tabstohtml(target,tablist,actionbtns = []){
+function getfavicon(tab){
+	var col = document.createElement("td");
+	if(ANDROID) hideElement(col);
+	if(tab.favIconUrl){
+		var img = document.createElement("img");
+		img.className = "image top";
+		img.src = tab.favIconUrl;
+		col.appendChild(img);}
+	if(tab.count>1){
+		var span = document.createElement("span");
+		span.className = "tabcount";
+		span.textContent = tab.count;
+		col.appendChild(span);}
+	return col;
+}
+
+//Converts tab list to html into table
+function tabstohtml(target,tablist,actionbtns){
 	var table = document.getElementById(target);
 	table.innerHTML = "";
-	tablist.forEach(function(tab){
+	tablist.filter(countduplicates).forEach(function(tab){
 		var row = document.createElement("tr");
+		row.className = (tab.incognito)?"incognito":"";
+		row.appendChild(getfavicon(tab));
 		var col = document.createElement("td");
-		if(tab.favIconUrl){
-			var img = document.createElement("img");
-			img.className = "image top";
-			img.src = tab.favIconUrl;
-			col.appendChild(img);}
-		if(android) hideElement(col);
-		row.appendChild(col);
-		col = document.createElement("td");
 		col.title = tab.url;
-		col.textContent = tab.url;
+		col.textContent = ((ANDROID && tab.count>1)?"("+tab.count+") ":"")+tab.url;
 		col.ondblclick = function(){focustab(tab)};
 		row.appendChild(col);
 		col = document.createElement("td");

@@ -82,6 +82,24 @@ textarea {
 	user-select: none;
 }
 
+.button:hover {
+	border-color: #0042AA;
+	background-color: #0042AA;
+	transition: 0.2s;
+}
+
+.button[disabled] {
+	border-color: #5B6C7D;
+	background-color: #5B6C7D;
+	color: #E0E0E0;
+}
+
+/* Fix CSS bug in Firefox */
+.button::-moz-focus-inner {
+    padding: 0;
+	border: 0;
+}
+
 .button.green:hover {
 	border-color: #00AA00;
 	background-color: #00AA00;
@@ -92,10 +110,4 @@ textarea {
 	border-color: #AA0000;
 	background-color: #AA0000;
 	transition: 0.2s;
-}
-
-/* Fix CSS bug in Firefox */
-.button::-moz-focus-inner {
-    padding: 0;
-	border: 0;
 }

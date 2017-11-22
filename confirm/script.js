@@ -1,9 +1,5 @@
 /* -------------------- Main Process -------------------- */
 
-//Browser compatibility
-var browser = browser || chrome;
-var android = !browser.windows;
-
 //Global variables
 var port = browser.runtime.Port;
 
@@ -29,6 +25,6 @@ window.onload = function(){
 };
 
 //Disconnects port
-window.onbeforeunload = function(){
+window.onunload = function(){
 	port.disconnect();
 };

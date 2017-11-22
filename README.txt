@@ -1,4 +1,4 @@
-﻿PopupFilter version 1.9 by Baptiste Thémine
+﻿PopupFilter version 2.0 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
 
@@ -15,7 +15,7 @@ The main advantage and difference of PopupFilter is that it works without any bl
 
 --------------------------------------------------------------------------------
 
-PopupFilter version 1.9 par Baptiste Thémine
+PopupFilter version 2.0 par Baptiste Thémine
 
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
 
@@ -33,11 +33,19 @@ Le principal avantage et la principale différence de PopupFilter est qu'il ne f
 --------------------------------------------------------------------------------
 
 PopupFilter updates :
+* version 2.0 (22/11/2017)
+Stable release :)
+- Add options_ui to manifest.json.
+- Add Restore Last button to browserAction popup.
+- Add duplicate tab grouping in Settings page.
+- Add different color to private tabs in Settings page.
+- Modify "About" block in Settings page.
+
 * version 1.9 (08/11/2017)
 - Fix issue with browser.runtime.port.onDisconnect event not firing for browserAction popup when window is closed.
-- Fix issue with browserAction.setBadgeBackgroundColor on Chrome.
-- Fix issue with Tab.favIconUrl not supported on Firefox Android.
 - Fix issue with tab count badge not updating in some case.
+- Fix compatibility issue with browserAction.setBadgeBackgroundColor on Chrome.
+- Fix compatibility issue with Tab.favIconUrl not supported on Firefox Android.
 - Add blocking web requests for popups to improve browser safety.
 - Add current mode to browserAction title for better visibility on Firefox Android.
 - Modify the appearance of browserAction popup.

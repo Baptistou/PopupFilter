@@ -94,6 +94,12 @@ p {
 	transition: 0.2s;
 }
 
+.button[disabled] {
+	border-color: #5B6C7D;
+	background-color: #5B6C7D;
+	color: #E0E0E0;
+}
+
 /* Fix CSS bug in Firefox */
 .button::-moz-focus-inner {
     padding: 0;
@@ -164,17 +170,12 @@ dl.accordion>dt:first-child {
 	border-top: 1rem solid #AAAAAA;
 }
 
-dl.accordion>dt:hover {
-	background-color: #0042AA;
-	transition: 0.2s;
-}
-
 dl.accordion>dt.active {
 	background-color: #000042;
 	color: white;
 }
 
-dl.accordion>dt.active:hover {
+dl.accordion>dt:hover, dl.accordion>dt.active:hover {
 	background-color: #0042AA;
 	transition: 0.2s;
 }
@@ -230,9 +231,16 @@ table.tablist>tr {
 	border-top: 1rem solid #E0E0E0;
 }
 
+table.tablist>tr.incognito {
+	background-color: #888888;
+	color: white;
+}
+
 table.tablist>tr>td:nth-child(1) {
+	position: relative;
 	width: 35rem;
 	padding: 5rem;
+	text-align: center;
 }
 
 table.tablist>tr>td:nth-child(2) {
@@ -258,10 +266,35 @@ table.tablist:empty~.msgbox {
 	display: block;
 }
 
+.tabcount {
+	display: inline-block;
+	line-height: 25rem;
+	min-width: 25rem;
+	padding: 0 2rem 0 2rem;
+	border-radius: 12.5rem;
+	text-align: center;
+	font-size: 18rem;
+	background-color: #000042;
+	color: white;
+	opacity: 0.9;
+}
+
+.image+.tabcount {
+	position: absolute;
+	right: 0;
+	bottom: 2rem;
+	line-height: 15rem;
+	min-width: 15rem;
+	border-radius: 7.5rem;
+	font-size: 11rem;
+}
+
 .icon-true, .icon-false, .icon-reset {
 	display: inline-block;
 	margin: 0 2rem 0 2rem;
+	line-height: 100%;
 	font-size: 24rem;
+	vertical-align: top;
 	cursor: pointer;
 }
 
@@ -314,6 +347,17 @@ table.tablist:empty~.msgbox {
 	border-top: 1px solid #E0E0E0;
 }
 
+.setting-block input:disabled+label {
+	color: #888888;
+}
+
+#readme {
+	float: right;
+	font-size: 18rem;
+	font-weight: normal;
+	color: #888888;
+}
+
 ul.optionlist-v {
 	display: block;
 	margin: 10rem 0 10rem 0;
@@ -343,10 +387,6 @@ ul.optionlist-h>li {
 
 ul.optionlist-h>li:hover {
 	background-color: #E0E0E0;
-}
-
-input:disabled+label {
-	color: #888888;
 }
 
 /* -------------------- Footer -------------------- */

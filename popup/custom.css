@@ -114,6 +114,12 @@ ul.optionlist>li:hover {
 	transition: 0.2s;
 }
 
+.button[disabled] {
+	border-color: #5B6C7D;
+	background-color: #5B6C7D;
+	color: #E0E0E0;
+}
+
 /* Fix CSS bug in Firefox */
 .button::-moz-focus-inner {
     padding: 0;

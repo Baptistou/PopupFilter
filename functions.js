@@ -1,3 +1,28 @@
+/* -------------------- WebExtensions -------------------- */
+
+//Browser compatibility
+var CHROMIUM = !browser;
+var FIREFOX = !!browser;
+var browser = browser || chrome;
+var ANDROID = !browser.windows;
+
+//Focuses specified tab
+function focustab(tab){
+	if(!ANDROID) browser.windows.update(tab.windowId,{focused: true});
+	browser.tabs.update(tab.id,{active: true});
+}
+
+//Closes specified tab and its window
+//Note: about:config --> browser.tabs.closeWindowWithLastTab
+function closetab(tab){
+	if(!ANDROID)
+		browser.tabs.query({windowId: tab.windowId},function(tabs){
+			if(tabs.length==1 && tabs[0].id==tab.id) browser.windows.remove(tab.windowId);
+			else browser.tabs.remove(tab.id);
+		});
+	else browser.tabs.remove(tab.id);
+}
+
 /* -------------------- Prototypes -------------------- */
 
 //Returns true if string contains str
@@ -14,7 +39,7 @@ String.prototype.occurrence = function(str){
 
 //Replaces all occurrences of str1 by str2
 String.prototype.replaceAll = function(str1,str2){
-	return this.replace(new RegExp(str1,"g"),str2);
+	return this.split(str1).join(str2);
 };
 
 //Removes the first occurence of str
@@ -124,23 +149,4 @@ function removeElement(target){
 //Removes element list
 function removeElements(list){
 	list.forEach(function(val){val.parentNode.removeChild(val)});
-}
-
-/* -------------------- WebExtensions -------------------- */
-
-//Focuses specified tab
-function focustab(tab){
-	if(!android) browser.windows.update(tab.windowId,{focused: true});
-	browser.tabs.update(tab.id,{active: true});
-}
-
-//Closes specified tab and its window
-//Note: about:config --> browser.tabs.closeWindowWithLastTab
-function closetab(tab){
-	if(!android)
-		browser.tabs.query({windowId: tab.windowId},function(tabs){
-			if(tabs.length==1 && tabs[0].id==tab.id) browser.windows.remove(tab.windowId);
-			else browser.tabs.remove(tab.id);
-		});
-	else browser.tabs.remove(tab.id);
 }

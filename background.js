@@ -19,23 +19,20 @@ function TabHistory(){
 	
 	//Public methods
 	this.get = function(tabid){
-		return this.data.find(function(val){
-			return (val.id==tabid);
-		});
+		return this.data.find(val => (val.id==tabid));
 	};
 	
 	this.getAll = function(obj){
-		return this.data.filter(function(val){
-			return objcontains(val,obj);
-		});
+		return this.data.filter(val => objcontains(val,obj));
 	};
 	
 	this.set = function(obj){
-		var val = this.get(obj.id);
-		if(!val){
-			obj.mode = obj.mode || 1;
-			this.data.push(obj);}
-		else for(var prop in obj) val[prop] = obj[prop];
+		if(obj.id!=browser.tabs.TAB_ID_NONE){
+			var val = this.get(obj.id);
+			if(!val){
+				obj.mode = obj.mode || 1;
+				this.data.push(obj);}
+			else for(var prop in obj) val[prop] = obj[prop];}
 	};
 	
 	this.update = function(list){
@@ -51,9 +48,7 @@ function TabHistory(){
 	};
 	
 	this.remove = function(tabid){
-		return this.data.remove(function(val){
-			return (val.id==tabid);
-		});
+		return this.data.remove(val => (val.id==tabid));
 	};
 	
 	this.clear = function(tabid){
@@ -77,16 +72,14 @@ function PortConnect(){
 		});
 		obj.port.onMessage.addListener(obj.msgget);
 		obj.port.onDisconnect.addListener(function(){
-			self.data.remove(function(val){
-				return (val.port.name==obj.port.name);
-			});
+			self.data.remove(val => (val.port.name==obj.port.name));
 		});
 	};
 	
-	this.send = function(namelist){
+	this.send = function(list){
 		this.data.removeAll(function(val){
 			try{
-				if(namelist.contains(val.port.name)) val.port.postMessage(val.msgpost());
+				if(list.contains(val.port.name)) val.port.postMessage(val.msgpost());
 				return false;}
 			catch(error){
 				return true;}
@@ -110,23 +103,13 @@ function Settings(){
 		self.options = storage.options || {};
 		self.options = {
 			popupfocus: self.options.popupfocus || 1,
-			showbadge: !(self.options.showbadge==false || android)
+			showbadge: !(self.options.showbadge==false || ANDROID)
 		};
 		self.updateicon();
 		self.updatebadge();
 	});
 	
 	//Private methods
-	var createtab = function(tab){
-		self.tab = tab;
-		self.focus = true;
-		if(!android) browser.windows.onFocusChanged.addListener(onwinfocus);
-		browser.tabs.onActivated.addListener(ontabfocus);
-		browser.tabs.onMoved.addListener(ontabmove);
-		browser.tabs.onAttached.addListener(ontabmove);
-		browser.tabs.onRemoved.addListener(ontabremove);
-	};
-	
 	var onwinfocus = function(winid){
 		self.focus = (self.tab.active && (self.tab.windowId==winid || winid==browser.windows.WINDOW_ID_NONE));
 		if(self.sync) self.send();
@@ -146,13 +129,13 @@ function Settings(){
 	
 	var ontabremove = function(tabid){
 		if(self.tab.id==tabid){
-			self.tab = null;
-			self.focus = false;
-			if(!android) browser.windows.onFocusChanged.removeListener(onwinfocus);
+			if(!ANDROID) browser.windows.onFocusChanged.removeListener(onwinfocus);
 			browser.tabs.onActivated.removeListener(ontabfocus);
 			browser.tabs.onMoved.removeListener(ontabmove);
 			browser.tabs.onAttached.removeListener(ontabmove);
-			browser.tabs.onRemoved.removeListener(ontabremove);}
+			browser.tabs.onRemoved.removeListener(ontabremove);
+			self.tab = null;
+			self.focus = false;}
 	};
 	
 	//Public methods
@@ -169,13 +152,29 @@ function Settings(){
 		browser.storage.local.set({options: this.options});
 	};
 	
-	this.open = function(){
-		if(this.tab) focustab(this.tab);
-		else browser.tabs.create({url: "/settings/index.html"},createtab);
-		//Firefox Android issue with browserAction popup and Settings page
-		if(android) setTimeout(function(){focustab(self.tab)},500);
+	this.settab = function(tab){
+		if(!self.tab){
+			if(!ANDROID) browser.windows.onFocusChanged.addListener(onwinfocus);
+			browser.tabs.onActivated.addListener(ontabfocus);
+			browser.tabs.onMoved.addListener(ontabmove);
+			browser.tabs.onAttached.addListener(ontabmove);
+			browser.tabs.onRemoved.addListener(ontabremove);}
+		else if(self.tab.id!=tab.id) closetab(self.tab);
+		self.tab = tab;
+		self.focus = true;
 	};
 	
+	//Opens Settings page
+	//Note: openOptionsPage() issue on Firefox and Opera + no Firefox Android support.
+	//Note: Firefox Android 58- issue with browserAction popup focus
+	this.open = function(){
+		//browser.runtime.openOptionsPage();
+		if(this.tab) focustab(this.tab);
+		else browser.tabs.create({url: "/settings/index.html"},this.settab);
+		if(ANDROID) setTimeout(function(){focustab(self.tab)},500);
+	};
+	
+	//Closes Settings page
 	this.close = function(){
 		if(this.tab) browser.tabs.remove(this.tab.id);
 	};
@@ -204,7 +203,7 @@ function Settings(){
 			3: {title: "Blocking", icon: "icon-blocking.png", color: "red"}
 		};
 		browser.browserAction.setTitle({title: "PopupFilter ("+actionbtn[this.mode].title+")"});
-		if(!android){
+		if(!ANDROID){
 			browser.browserAction.setIcon({path: "/images/"+actionbtn[this.mode].icon});
 			browser.browserAction.setBadgeBackgroundColor({color: actionbtn[this.mode].color});}
 	};
@@ -212,17 +211,13 @@ function Settings(){
 	//Updates browserAction badge
 	//Note: No Firefox Android support
 	this.updatebadge = function(){
-		if(!android){
+		if(!ANDROID){
 			var badge = this.options.showbadge && tabhistory.getAll({mode: this.mode}).length || "";
 			browser.browserAction.setBadgeText({text: badge.toString()});}
 	}
 }
 
 /* -------------------- Main Process -------------------- */
-
-//Browser compatibility
-var browser = browser || chrome;
-var android = !browser.windows;
 
 //Global variables
 var tabhistory = new TabHistory();
@@ -233,9 +228,7 @@ var syncpopup = [];
 //Tab open
 //Note: Firefox not firing on previous session restore
 browser.tabs.onCreated.addListener(function(tab){
-	var info = syncpopup.remove(function(val){
-		return (val.tabId==tab.id);
-	});
+	var info = syncpopup.remove(val => (val.tabId==tab.id));
 	if(info) preventpopup(tab,info);
 	else tabhistory.set(tab);
 	settings.updatebadge();
@@ -299,14 +292,15 @@ browser.runtime.onConnect.addListener(function(port){
 	switch(port.name){
 	case "confirm" : confirmcon(port);
 	break;
-	case "popup" :
-	case "settings" : settingscon(port);
+	case "settings" : settings.settab(port.sender.tab);
+	case "popup" : settingscon(port);
 	break;}
 });
 
 /* -------------------- Functions -------------------- */
 
 //Redirects to confirm page
+//Note : Chrome and Opera don't redirect in private mode
 function redirectconfirm(info){
 	var url = "/confirm/index.html#"+info.tabId;
 	switch(settings.options.popupfocus){
@@ -318,7 +312,7 @@ function redirectconfirm(info){
 		focustab(tabhistory.get(info.sourceTabId));
 	break;
 	case 3 : //Foreground focus
-		if(!android) browser.windows.update(info.windowId,{focused: true});
+		if(!ANDROID) browser.windows.update(info.windowId,{focused: true});
 		browser.tabs.update(info.tabId,{url: url, active: true});
 	break;}
 }
@@ -408,3 +402,4 @@ function settingscon(port){
 	});
 	portcon.send(["popup","settings"]);
 }
+

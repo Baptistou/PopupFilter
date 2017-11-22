@@ -1,9 +1,5 @@
 /* -------------------- Main Process -------------------- */
 
-//Browser compatibility
-var browser = browser || chrome;
-var android = !browser.windows;
-
 //Global variables
 var port = browser.runtime.Port;
 
@@ -18,6 +14,7 @@ window.onload = function(){
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
 		document.getElementById("mode"+msg.mode).checked = true;
 		seticon(msg.mode);
+		setrestorelastbtn(msg.closetabs[0]);
 	});
 	
 	//Radio boxes
@@ -49,4 +46,19 @@ function seticon(mode){
 		3: "/images/icon-blocking.png"
 	};
 	document.getElementById("icon").src = icons[mode];
+}
+
+//Sets Restore Last button
+function setrestorelastbtn(lasttab){
+	var button = document.getElementById("restorelast");
+	if(lasttab){
+		button.title = lasttab.url;
+		button.onclick = function(){
+			port.postMessage({status: "restore", tab: lasttab});
+		};
+		button.disabled = false;}
+	else{
+		button.title = "";
+		button.onclick = function(){};
+		button.disabled = true;}
 }
