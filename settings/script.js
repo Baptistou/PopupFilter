@@ -9,6 +9,7 @@ window.onload = function(){
 	
 	//Retrieves data from port
 	port.onMessage.addListener(function(msg){
+		document.getElementById("icon").src = geticon(msg.mode);
 		document.getElementById("nbopen").textContent = msg.opentabs.length;
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
@@ -17,20 +18,13 @@ window.onload = function(){
 		tabstohtml("closetabs",msg.closetabs,[restorebtn]);
 		document.getElementById("mode"+msg.mode).checked = true;
 		document.getElementById("popupfocus"+msg.options.popupfocus).checked = true;
+		document.getElementById("applycsp"+(!msg.options.applycsp+1)).checked = true;
 		document.getElementById("showbadge"+(!msg.options.showbadge+1)).checked = true;
-		updateicon(msg.mode);
 	});
 	
-	//Shows sections
-	var showsection = function(){
-		var section = document.getElementById(this.id.replace("nav-",""));
-		hideElements(document.querySelectorAll("section"));
-		showElement(section);
-		removeClass(document.querySelector("nav a.active"),"active");
-		addClass(this,"active");
-	};
-	document.getElementById("nav-overview").onclick = showsection;
-	document.getElementById("nav-settings").onclick = showsection;
+	//Sections
+	document.getElementById("nav-overview").onclick = function(){showsection("overview")};
+	document.getElementById("nav-settings").onclick = function(){showsection("settings")};
 	
 	//Accordion menu
 	document.querySelectorAll("dl.accordion>dt").forEach(function(item){
@@ -41,10 +35,11 @@ window.onload = function(){
 	var manifest = browser.runtime.getManifest();
 	document.getElementById("version").textContent = manifest.version;
 	document.getElementById("author").textContent = manifest.author;
-	document.querySelectorAll("a.link").forEach(function(link){
+	document.getElementById("description").textContent = manifest.description;
+	document.querySelectorAll("a.link[href]").forEach(function(link){
 		link.onclick = function(event){
 			event.preventDefault();
-			browser.tabs.create({url: this.href});
+			opentab({url: this.href, index: "next", active: true});
 		};
 	});
 	
@@ -56,9 +51,15 @@ window.onload = function(){
 	});
 	
 	//Options
+	//Note: No Firefox Android support for setBadgeText()
 	document.getElementsByName("popupfocus").forEach(function(radiobox){
 		radiobox.onchange = function(){
 			port.postMessage({status: "options", options: {popupfocus: parseInt(this.value)}});
+		};
+	});
+	document.getElementsByName("applycsp").forEach(function(radiobox){
+		radiobox.onchange = function(){
+			port.postMessage({status: "options", options: {applycsp: (this.value=="true")}});
 		};
 	});
 	document.getElementsByName("showbadge").forEach(function(radiobox){
@@ -74,10 +75,11 @@ window.onload = function(){
 		port.postMessage({status: "clear"});
 	};
 	document.getElementById("close").onclick = function(){
-		browser.tabs.getCurrent(function(tab){
-			browser.tabs.remove(tab.id);
-		});
+		browser.tabs.getCurrent(function(tab){closetab(tab)});
 	};
+	
+	//Internationalization
+	document.querySelectorAll("i18n, [data-i18n]").forEach(seti18ndata);
 };
 
 //Disconnects port
@@ -87,11 +89,28 @@ window.onunload = function(){
 
 /* -------------------- Functions -------------------- */
 
+//Returns icon according to mode
+function geticon(mode){
+	switch(mode){
+	case 1 : return "/images/icon-normal.png";
+	case 2 : return "/images/icon-confirm.png";
+	case 3 : return "/images/icon-blocking.png";}
+}
+
+//Shows sections
+function showsection(target){
+	hideElements(document.querySelectorAll("section"));
+	showElement(document.getElementById(target));
+	removeClass(document.querySelector("nav a.active"),"active");
+	addClass(document.getElementById("nav-"+target),"active");
+	window.scrollTo(0,0);
+};
+
 //Action buttons
 var openbtn = function(tab){
 	var button = document.createElement("span");
 	button.className = "icon-true";
-	button.title = "Display";
+	button.title = geti18ndata("Display");
 	button.onclick = function(){
 		port.postMessage({status: "open", tab: tab});
 	};
@@ -100,7 +119,7 @@ var openbtn = function(tab){
 var closebtn = function(tab){
 	var button = document.createElement("span");
 	button.className = "icon-false";
-	button.title = "Close";
+	button.title = geti18ndata("Close");
 	button.onclick = function(){
 		port.postMessage({status: "close", tab: tab});
 	};
@@ -109,7 +128,7 @@ var closebtn = function(tab){
 var restorebtn = function(tab){
 	var button = document.createElement("span");
 	button.className = "icon-reset";
-	button.title = "Restore";
+	button.title = geti18ndata("Restore");
 	button.onclick = function(){
 		port.postMessage({status: "restore", tab: tab});
 	};
@@ -124,9 +143,10 @@ function countduplicates(tab,i,list){
 };
 
 //Gets tab favicon
-//Note: Tab.favIconUrl not supported on Firefox Android
+//Note: No Firefox Android support for Tab.favIconUrl
 function getfavicon(tab){
 	var col = document.createElement("td");
+	col.ondblclick = function(){focustab(tab)};
 	if(ANDROID) hideElement(col);
 	if(tab.favIconUrl){
 		var img = document.createElement("img");
@@ -159,14 +179,4 @@ function tabstohtml(target,tablist,actionbtns){
 		row.appendChild(col);
 		table.appendChild(row);
 	});
-}
-
-//Changes icon according to mode
-function updateicon(mode){
-	var icons = {
-		1: "/images/icon-normal.png",
-		2: "/images/icon-confirm.png",
-		3: "/images/icon-blocking.png"
-	};
-	document.getElementById("icon").src = icons[mode];
 }

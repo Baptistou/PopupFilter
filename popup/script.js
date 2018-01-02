@@ -9,26 +9,28 @@ window.onload = function(){
 	
 	//Retrieves data from port
 	port.onMessage.addListener(function(msg){
+		document.getElementById("icon").src = geticon(msg.mode);
 		document.getElementById("nbopen").textContent = msg.opentabs.length;
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
 		document.getElementById("nbclose").textContent = msg.closetabs.length;
 		document.getElementById("mode"+msg.mode).checked = true;
-		seticon(msg.mode);
-		setrestorelastbtn(msg.closetabs[0]);
+		setrestorelastbtn(msg.closetabs.first());
 	});
 	
-	//Radio boxes
-	var radiobox = document.getElementsByName("mode");
-	for(var i=0; i<radiobox.length; i++){
-		radiobox[i].onchange = function(){
+	//Modes
+	document.getElementsByName("mode").forEach(function(radiobox){
+		radiobox.onchange = function(){
 			port.postMessage({status: "mode", mode: parseInt(this.value)});
 		};
-	}
+	});
 	
 	//Shows settings page
 	document.getElementById("settings").onclick = function(){
 		port.postMessage({status: "settings"});
 	};
+	
+	//Internationalization
+	document.querySelectorAll("i18n, [data-i18n]").forEach(seti18ndata);
 };
 
 //Disconnects port
@@ -38,14 +40,12 @@ window.onunload = function(){
 
 /* -------------------- Functions -------------------- */
 
-//Changes icon according to mode
-function seticon(mode){
-	var icons = {
-		1: "/images/icon-normal.png",
-		2: "/images/icon-confirm.png",
-		3: "/images/icon-blocking.png"
-	};
-	document.getElementById("icon").src = icons[mode];
+//Returns icon according to mode
+function geticon(mode){
+	switch(mode){
+	case 1 : return "/images/icon-normal.png";
+	case 2 : return "/images/icon-confirm.png";
+	case 3 : return "/images/icon-blocking.png";}
 }
 
 //Sets Restore Last button

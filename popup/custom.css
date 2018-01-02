@@ -70,6 +70,7 @@ table.tabstatus {
 
 table.tabstatus>tbody>tr>td {
 	border: 1px solid #E0E0E0;
+	overflow: hidden;
 }
 
 ul.optionlist {

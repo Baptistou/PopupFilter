@@ -37,6 +37,10 @@ p {
 	margin: 10rem 0;
 }
 
+input:disabled+label {
+	color: #888888;
+}
+
 .top {
 	vertical-align: top !important;
 }
@@ -145,6 +149,21 @@ content {
 	max-width: 800rem;
 	margin: auto;
 	padding: 0 10rem 50rem 10rem;
+}
+
+.block {
+	display: block;
+	margin: 20rem 0 20rem 0;
+	border-top: 1px solid #E0E0E0;
+}
+
+.link {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+h2 .link {
+	float: right;
 }
 
 /* -------------------- Tab List Overview -------------------- */
@@ -292,9 +311,8 @@ table.tablist:empty~.msgbox {
 .icon-true, .icon-false, .icon-reset {
 	display: inline-block;
 	margin: 0 2rem 0 2rem;
-	line-height: 100%;
+	height: 35rem;
 	font-size: 24rem;
-	vertical-align: top;
 	cursor: pointer;
 }
 
@@ -325,8 +343,6 @@ table.tablist:empty~.msgbox {
 }
 
 .icon-reset {
-	position: relative;
-	top: -2rem;
 	font-weight: bold;
 	color: #0072C6;
 }
@@ -341,22 +357,6 @@ table.tablist:empty~.msgbox {
 }
 
 /* -------------------- Settings -------------------- */
-
-.setting-block {
-	margin: 20rem 0 20rem 0;
-	border-top: 1px solid #E0E0E0;
-}
-
-.setting-block input:disabled+label {
-	color: #888888;
-}
-
-#readme {
-	float: right;
-	font-size: 18rem;
-	font-weight: normal;
-	color: #888888;
-}
 
 ul.optionlist-v {
 	display: block;
@@ -387,6 +387,26 @@ ul.optionlist-h>li {
 
 ul.optionlist-h>li:hover {
 	background-color: #E0E0E0;
+}
+
+.icon-help {
+	display: inline-block;
+	line-height: 25rem;
+	height: 25rem;
+    width: 25rem;
+    border-radius: 50%;
+    text-align: center;
+    background-color: #CCCCCC;
+    color: white;
+}
+
+.icon-help:hover {
+	background-color: #BBBBBB;
+	transition: 0.2s;
+}
+
+.icon-help::before {
+	content: "\003F";
 }
 
 /* -------------------- Footer -------------------- */

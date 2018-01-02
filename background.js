@@ -1,5 +1,42 @@
 /* -------------------- Classes -------------------- */
 
+function PortConnect(){
+	//Variables
+	this.data = [];
+	var self = this;
+	var count = 1;
+	
+	//Public methods
+	this.connect = function(obj){
+		var id = count++;
+		this.data.push({
+			id: id,
+			port: obj.port,
+			msgpost: obj.msgpost,
+			disconnect: obj.disconnect
+		});
+		if(obj.msgget) obj.port.onMessage.addListener(obj.msgget);
+		obj.port.onDisconnect.addListener(function(){
+			if(obj.disconnect) obj.disconnect();
+			self.data.remove(val => (val.id==id));
+		});
+	};
+	
+	this.send = function(list,message = null){
+		this.data.removeAll(function(val){
+			try{
+				if(list.contains(val.port.name)){
+					if(message) val.port.postMessage(message);
+					else if(val.msgpost) val.port.postMessage(val.msgpost());
+					else val.port.postMessage();}
+				return false;}
+			catch(error){
+				if(val.disconnect) val.disconnect();
+				return true;}
+		});
+	};
+}
+
 function TabHistory(){
 	//Variables
 	this.data = [];
@@ -45,6 +82,7 @@ function TabHistory(){
 				else for(var prop in obj){
 					if(val.mode==1 || prop!="url") val[prop] = obj[prop];}}
 		});
+		self.data.removeAll(val1 => (val1.mode==1 && !list.find(val2 => (val1.id==val2.id))));
 	};
 	
 	this.remove = function(tabid){
@@ -53,36 +91,8 @@ function TabHistory(){
 	
 	this.clear = function(tabid){
 		this.data.removeAll(function(val){
-			if(val.mode==2) browser.tabs.remove(val.id);
+			if(val.mode==2) closetab(val);
 			return (val.mode==2 || val.mode==3);
-		});
-	};
-}
-
-function PortConnect(){
-	//Variables
-	this.data = [];
-	var self = this;
-	
-	//Public methods
-	this.connect = function(obj){
-		this.data.push({
-			port: obj.port,
-			msgpost: obj.msgpost
-		});
-		obj.port.onMessage.addListener(obj.msgget);
-		obj.port.onDisconnect.addListener(function(){
-			self.data.remove(val => (val.port.name==obj.port.name));
-		});
-	};
-	
-	this.send = function(list){
-		this.data.removeAll(function(val){
-			try{
-				if(list.contains(val.port.name)) val.port.postMessage(val.msgpost());
-				return false;}
-			catch(error){
-				return true;}
 		});
 	};
 }
@@ -103,9 +113,10 @@ function Settings(){
 		self.options = storage.options || {};
 		self.options = {
 			popupfocus: self.options.popupfocus || 1,
-			showbadge: !(self.options.showbadge==false || ANDROID)
+			applycsp: (self.options.applycsp!=false),
+			showbadge: (!ANDROID && self.options.showbadge!=false)
 		};
-		self.updateicon();
+		self.updatebutton();
 		self.updatebadge();
 	});
 	
@@ -141,7 +152,7 @@ function Settings(){
 	//Public methods
 	this.setmode = function(val){
 		this.mode = parseInt(val);
-		this.updateicon();
+		this.updatebutton();
 		this.updatebadge();
 		browser.storage.local.set({mode: this.mode});
 	};
@@ -170,13 +181,13 @@ function Settings(){
 	this.open = function(){
 		//browser.runtime.openOptionsPage();
 		if(this.tab) focustab(this.tab);
-		else browser.tabs.create({url: "/settings/index.html"},this.settab);
+		else opentab({url: "/settings/index.html", active: true},this.settab);
 		if(ANDROID) setTimeout(function(){focustab(self.tab)},500);
 	};
 	
 	//Closes Settings page
 	this.close = function(){
-		if(this.tab) browser.tabs.remove(this.tab.id);
+		if(this.tab) ontabremove(this.tab.id);
 	};
 	
 	//Sends data synchronously to Settings page
@@ -194,9 +205,9 @@ function Settings(){
 		else this.sync = true;
 	};
 	
-	//Updates browserAction icon
-	//Note: No Firefox Android support
-	this.updateicon = function(){
+	//Updates browserAction button
+	//Note: No Firefox Android support for setIcon()
+	this.updatebutton = function(){
 		var actionbtn = {
 			1: {title: "Normal", icon: "icon-normal.png", color: "#32BC10"},
 			2: {title: "Confirm", icon: "icon-confirm.png", color: "orange"},
@@ -209,7 +220,7 @@ function Settings(){
 	};
 	
 	//Updates browserAction badge
-	//Note: No Firefox Android support
+	//Note: No Firefox Android support for setBadgeText()
 	this.updatebadge = function(){
 		if(!ANDROID){
 			var badge = this.options.showbadge && tabhistory.getAll({mode: this.mode}).length || "";
@@ -220,8 +231,8 @@ function Settings(){
 /* -------------------- Main Process -------------------- */
 
 //Global variables
-var tabhistory = new TabHistory();
 var portcon = new PortConnect();
+var tabhistory = new TabHistory();
 var settings = new Settings();
 var syncpopup = [];
 
@@ -237,7 +248,7 @@ browser.tabs.onCreated.addListener(function(tab){
 
 //Popup open
 //Note: Firefox Android not firing with links
-//Note: Chrome doesn't support info.windowId
+//Note: No Chrome support for info.windowId
 browser.webNavigation.onCreatedNavigationTarget.addListener(function(info){
 	var tab = tabhistory.get(info.tabId);
 	if(tab){
@@ -255,6 +266,24 @@ browser.webRequest.onBeforeRequest.addListener(
 	},
 	{urls: ["<all_urls>"], types: ["main_frame"]},
 	["blocking"]
+);
+
+//Prevents popups with Content Security Policy
+//Note: Chromium PDF Viewer Plugin not working with CSP sandbox
+browser.webRequest.onHeadersReceived.addListener(
+	function(info){
+		if(settings.mode==3 && settings.options.applycsp &&
+			!(CHROMIUM && info.responseHeaders.find(
+				val => (val.name=="Content-Type" && val.value=="application/pdf")
+			)))
+			info.responseHeaders.push({
+				name: "Content-Security-Policy",
+				value: "sandbox allow-forms allow-presentation allow-same-origin allow-scripts;"
+			});
+		return {responseHeaders: info.responseHeaders};
+	},
+	{urls: ["<all_urls>"], types: ["main_frame"]},
+	["blocking","responseHeaders"]
 );
 
 //Tab update
@@ -277,6 +306,7 @@ browser.tabs.onAttached.addListener(function(tabid,info){
 });
 
 //Tab close
+//Note: Firefox Quantum not firing in some case
 browser.tabs.onRemoved.addListener(function(tabid,info){
 	var tab = tabhistory.get(tabid);
 	if(tab){
@@ -300,7 +330,7 @@ browser.runtime.onConnect.addListener(function(port){
 /* -------------------- Functions -------------------- */
 
 //Redirects to confirm page
-//Note : Chrome and Opera don't redirect in private mode
+//Note: Chrome and Opera don't redirect in private mode
 function redirectconfirm(info){
 	var url = "/confirm/index.html#"+info.tabId;
 	switch(settings.options.popupfocus){
@@ -391,15 +421,17 @@ function settingscon(port){
 			break;
 			case "restore" :
 				tabhistory.remove(msg.tab.id);
-				browser.tabs.create({url: msg.tab.url, active: false});
+				opentab({url: msg.tab.url, index: "next", active: false});
 			break;
 			case "clear" :
 				tabhistory.clear();
 				settings.updatebadge();
 			break;}
 			portcon.send(["popup","settings"]);
+		},
+		disconnect: function(){
+			if(port.name=="settings") settings.close();
 		}
 	});
 	portcon.send(["popup","settings"]);
 }
-

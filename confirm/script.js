@@ -22,6 +22,9 @@ window.onload = function(){
 			port.postMessage({status: "close"});
 		});
 	};
+	
+	//Internationalization
+	document.querySelectorAll("i18n, [data-i18n]").forEach(seti18ndata);
 };
 
 //Disconnects port
