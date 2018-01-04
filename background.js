@@ -270,6 +270,8 @@ browser.webRequest.onBeforeRequest.addListener(
 
 //Prevents popups with Content Security Policy
 //Note: Chromium PDF Viewer Plugin not working with CSP sandbox
+var CSP_SANDBOX_NOPOPUPS = "sandbox allow-forms allow-orientation-lock allow-pointer-lock"
+	+ "allow-presentation allow-same-origin allow-scripts allow-top-navigation;";
 browser.webRequest.onHeadersReceived.addListener(
 	function(info){
 		if(settings.mode==3 && settings.options.applycsp &&
@@ -278,7 +280,7 @@ browser.webRequest.onHeadersReceived.addListener(
 			)))
 			info.responseHeaders.push({
 				name: "Content-Security-Policy",
-				value: "sandbox allow-forms allow-presentation allow-same-origin allow-scripts;"
+				value: CSP_SANDBOX_NOPOPUPS
 			});
 		return {responseHeaders: info.responseHeaders};
 	},
