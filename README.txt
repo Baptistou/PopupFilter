@@ -1,4 +1,4 @@
-﻿PopupFilter version 3.1 by Baptiste Thémine
+﻿PopupFilter version 3.2 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
 
@@ -15,7 +15,7 @@ The main advantage and difference of PopupFilter is that it works without any bl
 
 --------------------------------------------------------------------------------
 
-PopupFilter version 3.1 par Baptiste Thémine
+PopupFilter version 3.2 par Baptiste Thémine
 
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
 
@@ -36,6 +36,13 @@ Language support : English, French, Italian, Spanish.
 Browser support : Firefox 54+, Firefox Android 57+, Chrome 42+, Opera 33+.
 
 Updates :
+* version 3.2 (25/03/2018)
+- Fix CSP sandbox invalid option.
+- Add browserAction title translation for Firefox Android.
+- CSS responsive improvements for large screens.
+- Icon font improvements for Windows and Linux.
+- Code and performance improvements.
+
 * version 3.1 (04/01/2018)
 - Fix compatibility issue with Chromium PDF Viewer Plugin not working with CSP sandbox.
 - Fix compatibility issue with Firefox not opening Google links with CSP sandbox.

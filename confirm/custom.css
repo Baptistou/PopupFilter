@@ -1,6 +1,8 @@
+/* -------------------- Global definitions -------------------- */
+
 * {
 	box-sizing: border-box;
-    font-family: "Segoe UI";
+	font-family: "Segoe UI";
 	font-size: 100%;
 }
 
@@ -8,58 +10,35 @@ html {
 	font-size: 1px;
 }
 
-@media screen and (orientation: landscape) {
-	html {font-size: 0.15vh;}
+@media screen and (orientation: landscape) and (max-width: 1000px) {
+	html { font-size: 0.1vw; }
 }
 
-@media screen and (orientation: portrait) {
-	html {font-size: 0.22vw;}
+@media screen and (orientation: portrait) and (max-width: 500px) {
+	html { font-size: 0.2vw; }
 }
 
 body {
 	margin: 0;
 	font-size: 20rem;
+	background-color: black;
 	background-image: url(/images/space.jpg);
 }
 
 @media screen and (min-width: 1200px) {
-	body {background-size: 100%;}
+	body { background-size: 100%; }
 }
 
 @media screen and (max-width: 1200px) {
-	body {background-size: 1200px;}
-}
-
-content {
-	display: block;
-	max-width: 500rem;
-	margin: 100rem auto 100rem auto;
-	text-align: center;
-	color: white;
-	animation: fadein 1s;
-	opacity: 0.9;
+	body { background-size: 1200px; }
 }
 
 @keyframes fadein {
-	from{opacity: 0;}
-	to{opacity: 0.9;}
+	from { opacity: 0; }
+	to { opacity: 0.9; }
 }
 
-h1 {
-	font-size: 50rem;
-	margin: 30rem 0;
-}
-
-textarea {
-	display: block;
-	height: 150rem;
-	width: 100%;
-	margin: 20rem 0;
-	text-align: left;
-	word-wrap: break-word;
-	word-break: break-all;
-	resize: none;
-}
+/* -------------------- Components -------------------- */
 
 .button {
 	display: inline-block;
@@ -88,7 +67,7 @@ textarea {
 	transition: 0.2s;
 }
 
-.button[disabled] {
+.button:disabled {
 	border-color: #5B6C7D;
 	background-color: #5B6C7D;
 	color: #E0E0E0;
@@ -96,7 +75,7 @@ textarea {
 
 /* Fix CSS bug in Firefox */
 .button::-moz-focus-inner {
-    padding: 0;
+	padding: 0;
 	border: 0;
 }
 
@@ -110,4 +89,32 @@ textarea {
 	border-color: #AA0000;
 	background-color: #AA0000;
 	transition: 0.2s;
+}
+
+/* -------------------- Content -------------------- */
+
+content {
+	display: block;
+	max-width: 500rem;
+	margin: 100rem auto 100rem auto;
+	text-align: center;
+	color: white;
+	animation: fadein 1s;
+	opacity: 0.9;
+}
+
+content h1 {
+	font-size: 50rem;
+	margin: 30rem 0;
+}
+
+content textarea {
+	display: block;
+	height: 150rem;
+	width: 100%;
+	margin: 20rem 0;
+	text-align: left;
+	word-wrap: break-word;
+	word-break: break-all;
+	resize: none;
 }

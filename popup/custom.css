@@ -2,7 +2,7 @@
 
 * {
 	box-sizing: border-box;
-    font-family: "Segoe UI";
+	font-family: "Segoe UI";
 	font-size: 100%;
 }
 
@@ -13,11 +13,7 @@ html {
 body {
 	padding: 5rem;
 	font-size: 20rem;
-}
-
-content {
-	display: table;
-	margin: auto;
+	background-color: white;
 }
 
 h1 {
@@ -27,7 +23,6 @@ h1 {
 
 p {
 	margin: 10rem 0;
-	font-size: 20rem;
 }
 
 .top {
@@ -58,35 +53,7 @@ p {
 	display: none !important;
 }
 
-/* -------------------- Content -------------------- */
-
-table.tabstatus {
-	display: table;
-	table-layout: fixed;
-	width: 250rem;
-	border-collapse: collapse;
-	text-align: center;
-}
-
-table.tabstatus>tbody>tr>td {
-	border: 1px solid #E0E0E0;
-	overflow: hidden;
-}
-
-ul.optionlist {
-	display: block;
-	margin: 10rem 0 10rem 0;
-	padding: 0;
-	list-style: none;
-}
-
-ul.optionlist>li {
-	padding: 5rem 0 5rem 0;
-}
-
-ul.optionlist>li:hover {
-	background-color: #E0E0E0;
-}
+/* -------------------- Components -------------------- */
 
 .button {
 	display: inline-block;
@@ -115,7 +82,7 @@ ul.optionlist>li:hover {
 	transition: 0.2s;
 }
 
-.button[disabled] {
+.button:disabled {
 	border-color: #5B6C7D;
 	background-color: #5B6C7D;
 	color: #E0E0E0;
@@ -123,6 +90,41 @@ ul.optionlist>li:hover {
 
 /* Fix CSS bug in Firefox */
 .button::-moz-focus-inner {
-    padding: 0;
+	padding: 0;
 	border: 0;
+}
+
+/* -------------------- Content -------------------- */
+
+content {
+	display: table;
+	margin: auto;
+}
+
+table.tabstatus {
+	display: table;
+	table-layout: fixed;
+	width: 250rem;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+table.tabstatus>tbody>tr>td {
+	border: 1px solid #E0E0E0;
+	overflow: hidden;
+}
+
+ul.optionlist {
+	display: block;
+	margin: 10rem 0 10rem 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.optionlist>li {
+	padding: 5rem 0 5rem 0;
+}
+
+ul.optionlist>li:hover {
+	background-color: #E0E0E0;
 }

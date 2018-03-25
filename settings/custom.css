@@ -2,7 +2,7 @@
 
 * {
 	box-sizing: border-box;
-    font-family: "Segoe UI";
+	font-family: "Segoe UI";
 	font-size: 100%;
 }
 
@@ -10,17 +10,18 @@ html {
 	font-size: 1px;
 }
 
-@media screen and (orientation: landscape) {
-	html {font-size: 0.15vh;}
+@media screen and (orientation: landscape) and (max-width: 1000px) {
+	html { font-size: 0.1vw; }
 }
 
-@media screen and (orientation: portrait) {
-	html {font-size: 0.22vw;}
+@media screen and (orientation: portrait) and (max-width: 500px) {
+	html { font-size: 0.2vw; }
 }
 
 body {
 	margin: 0;
 	font-size: 18rem;
+	background-color: white;
 }
 
 h1 {
@@ -98,7 +99,7 @@ input:disabled+label {
 	transition: 0.2s;
 }
 
-.button[disabled] {
+.button:disabled {
 	border-color: #5B6C7D;
 	background-color: #5B6C7D;
 	color: #E0E0E0;
@@ -106,7 +107,7 @@ input:disabled+label {
 
 /* Fix CSS bug in Firefox */
 .button::-moz-focus-inner {
-    padding: 0;
+	padding: 0;
 	border: 0;
 }
 
@@ -122,22 +123,22 @@ nav {
 	display: block;
 	max-width: 800rem;
 	margin: auto;
-	font-size: 22rem;
+	font-size: 24rem;
 	padding: 0 10rem 0 10rem;
 }
 
-nav a {
+nav .link {
 	padding: 5rem;
 	color: #888888;
 	text-decoration: none;
 	cursor: pointer;
 }
 
-nav a:hover {
+nav .link:hover {
 	background-color: #E0E0E0;
 }
 
-nav a.active {
+nav .link.active {
 	color: #0042AA;
 	text-decoration: underline;
 }
@@ -157,22 +158,17 @@ content {
 	border-top: 1px solid #E0E0E0;
 }
 
-.link {
-	text-decoration: underline;
-	cursor: pointer;
-}
-
 h2 .link {
 	float: right;
 }
 
-/* -------------------- Tab List Overview -------------------- */
+/* -------------------- Tab list overview -------------------- */
 
 dl.accordion {
 	display: block;
 }
 
-dl.accordion>dt  {
+dl.accordion>dt	 {
 	display: block;
 	position: relative;
 	margin: 0;
@@ -221,7 +217,7 @@ dl.accordion>dt.active>.icon::before {
 	content: "\2796";
 }
 
-dl.accordion>dd  {
+dl.accordion>dd	 {
 	display: none;
 	width: 100%;
 	margin: 0;
@@ -235,42 +231,42 @@ dl.accordion>dt.active+dd {
 	display: block;
 }
 
-table.tablist {
+table.list-tabs {
 	display: table;
 	table-layout: fixed;
 	width: 100%;
 	border-collapse: collapse;
 }
 
-table.tablist>tr:first-child {
+table.list-tabs>tr:first-child {
 	border-top: 0;
 }
 
-table.tablist>tr {
+table.list-tabs>tr {
 	border-top: 1rem solid #E0E0E0;
 }
 
-table.tablist>tr.incognito {
+table.list-tabs>tr.incognito {
 	background-color: #888888;
 	color: white;
 }
 
-table.tablist>tr>td:nth-child(1) {
+table.list-tabs>tr>td:nth-child(1) {
 	position: relative;
 	width: 35rem;
 	padding: 5rem;
 	text-align: center;
 }
 
-table.tablist>tr>td:nth-child(2) {
+table.list-tabs>tr>td:nth-child(2) {
 	padding: 5rem;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-table.tablist>tr>td:nth-child(3) {
-	width: 65rem;
+table.list-tabs>tr>td:nth-child(3) {
+	width: 60rem;
 	padding: 0 8rem 0 8rem;
 	text-align: right;
 }
@@ -281,7 +277,7 @@ table.tablist>tr>td:nth-child(3) {
 	text-align: center;
 }
 
-table.tablist:empty~.msgbox {
+table.list-tabs:empty~.msgbox {
 	display: block;
 }
 
@@ -308,105 +304,37 @@ table.tablist:empty~.msgbox {
 	font-size: 11rem;
 }
 
-.icon-true, .icon-false, .icon-reset {
-	display: inline-block;
-	margin: 0 2rem 0 2rem;
-	height: 35rem;
-	font-size: 24rem;
-	cursor: pointer;
-}
-
-.icon-true {
-	color: #22DD22;
-}
-
-.icon-true:hover {
-	color: #00AA00;
-	transition: 0.2s;
-}
-
-.icon-true::before {
-	content: "\2714";
-}
-
-.icon-false {
-	color: #DD2222;
-}
-
-.icon-false:hover {
-	color: #AA0000;
-	transition: 0.2s;
-}
-
-.icon-false::before {
-	content: "\2716";
-}
-
-.icon-reset {
-	font-weight: bold;
-	color: #0072C6;
-}
-
-.icon-reset:hover {
-	color: #0052A6;
-	transition: 0.2s;
-}
-
-.icon-reset::before {
-	content: "\21BB";
-}
-
 /* -------------------- Settings -------------------- */
 
-ul.optionlist-v {
+ul.list-options-v {
 	display: block;
 	margin: 10rem 0 10rem 0;
 	padding: 0;
 	list-style: none;
 }
 
-ul.optionlist-v>li {
+ul.list-options-v>li {
 	padding: 5rem 0 5rem 0;
 }
 
-ul.optionlist-v>li:hover {
+ul.list-options-v>li:hover {
 	background-color: #E0E0E0;
 }
 
-ul.optionlist-h {
+ul.list-options-h {
 	display: block;
 	margin: 10rem 0 10rem 0;
 	padding: 0;
 }
 
-ul.optionlist-h>li {
+ul.list-options-h>li {
 	display: inline-block;
 	padding: 5rem;
 	margin: 0 5rem 0 5rem;
 }
 
-ul.optionlist-h>li:hover {
+ul.list-options-h>li:hover {
 	background-color: #E0E0E0;
-}
-
-.icon-help {
-	display: inline-block;
-	line-height: 25rem;
-	height: 25rem;
-    width: 25rem;
-    border-radius: 50%;
-    text-align: center;
-    background-color: #CCCCCC;
-    color: white;
-}
-
-.icon-help:hover {
-	background-color: #BBBBBB;
-	transition: 0.2s;
-}
-
-.icon-help::before {
-	content: "\003F";
 }
 
 /* -------------------- Footer -------------------- */
@@ -421,4 +349,74 @@ footer {
 	text-align: center;
 	background-color: white;
 	box-shadow: 0 0 5rem rgba(0,0,0,0.175);
+}
+
+/* -------------------- Icons -------------------- */
+
+.icon-true, .icon-false, .icon-reset {
+	display: inline-block;
+	height: 35rem;
+	line-height: 35rem;
+	font-size: 24rem;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.icon-true {
+	color: #22DD22;
+}
+
+.icon-true:hover {
+	color: #00AA00;
+	transition: 0.2s;
+}
+
+.icon-true::before {
+	content: "\2713";
+}
+
+.icon-false {
+	color: #DD2222;
+}
+
+.icon-false:hover {
+	color: #AA0000;
+	transition: 0.2s;
+}
+
+.icon-false::before {
+	content: "\2715";
+}
+
+.icon-reset {
+	color: #0072C6;
+}
+
+.icon-reset:hover {
+	color: #0052A6;
+	transition: 0.2s;
+}
+
+.icon-reset::before {
+	content: "\21BB";
+}
+
+.icon-help {
+	display: inline-block;
+	height: 25rem;
+	line-height: 25rem;
+	width: 25rem;
+	border-radius: 50%;
+	text-align: center;
+	background-color: #CCCCCC;
+	color: white;
+}
+
+.icon-help:hover {
+	background-color: #BBBBBB;
+	transition: 0.2s;
+}
+
+.icon-help::before {
+	content: "\003F";
 }

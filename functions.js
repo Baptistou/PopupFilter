@@ -1,67 +1,3 @@
-/* -------------------- WebExtensions -------------------- */
-
-//Browser compatibility
-var CHROMIUM = !browser;
-var FIREFOX = !!browser;
-var browser = browser || chrome;
-var ANDROID = !browser.windows;
-
-//Opens a new tab
-function opentab(tab,callback = function(){}){
-	switch(tab.index){
-	case "next" :
-		var winid = !ANDROID && (tab.windowId || browser.windows.WINDOW_ID_CURRENT);
-		var currenttab = (winid)?{active: true, windowId: winid}:{active: true};
-		browser.tabs.query(currenttab,function(tabs){
-			tab.index = tabs[0].index+1;
-			browser.tabs.create(tab,callback);
-		});
-	break;
-	case "begin" :
-		tab.index = 0;
-		browser.tabs.create(tab,callback);
-	break;
-	case "end" :
-		tab.index = 1000000;
-		browser.tabs.create(tab,callback);
-	break;
-	default : browser.tabs.create(tab,callback);
-	break;}
-}
-
-//Focuses specified tab
-function focustab(tab){
-	if(!ANDROID) browser.windows.update(tab.windowId,{focused: true});
-	browser.tabs.update(tab.id,{active: true});
-}
-
-//Closes specified tab and its window
-//Note: about:config --> browser.tabs.closeWindowWithLastTab
-function closetab(tab){
-	if(!ANDROID)
-		browser.tabs.query({windowId: tab.windowId},function(tabs){
-			if(tabs.length==1 && tabs[0].id==tab.id) browser.windows.remove(tab.windowId);
-			else browser.tabs.remove(tab.id);
-		});
-	else browser.tabs.remove(tab.id);
-}
-
-//Internationalization
-function geti18ndata(obj){
-	return browser.i18n.getMessage(
-		(obj.key)?"@"+obj.key:
-		(obj.msg)?obj.msg.replaceAll(" ","_"):
-		obj.replaceAll(" ","_")
-	) || obj.msg || obj;
-}
-
-function seti18ndata(item){
-	var data = item.getAttribute("data-i18n") || item.getAttribute("data");
-	if(item.placeholder) item.placeholder = geti18ndata({key: data, msg: item.placeholder});
-	if(item.textContent) item.textContent = geti18ndata({key: data, msg: item.textContent});
-	if(item.title) item.title = geti18ndata({key: data, msg: item.title});
-}
-
 /* -------------------- Prototypes -------------------- */
 
 //Returns true if string contains str
@@ -106,17 +42,104 @@ Array.prototype.contains = function(val){
 	return (this.indexOf(val)>=0);
 };
 
-//Inserts value into array at specified index
-Array.prototype.insert = function(index,val){
-	this.splice(index,0,val);
-};
-
 //Returns number of elements that fulfill condition
 Array.prototype.count = function(callback){
 	var count=0;
 	for(var i=0; i<this.length; i++){
 		if(callback(this[i],i,this)) count++;}
 	return count;
+};
+
+//Inserts value into array at specified index
+Array.prototype.insert = function(index,val){
+	this.splice(index,0,val);
+};
+
+//Flattens array
+Array.prototype.flatten = function(){
+	return this.reduce(function(acc,val){ return acc.concat(val) },[]);
+};
+
+//Maps and flattens array
+Array.prototype.flatMap = function(callback){
+	return this.reduce(function(acc,val,index,self){ return acc.concat(callback(val,index,self)) },[]);
+};
+
+//Groups array values by key from specified callback
+Array.prototype.groupBy = function(callback){
+	return this
+		.reduce(function(acc,val){
+			var key = callback(val);
+			var group = acc.find(function(val){ return (callback(val[0])===key) });
+			if(group===undefined) acc.push([val]);
+			else group.push(val);
+			return acc;
+		},[])
+		.map(function(val){ 
+			return (val.length>1)? val : val[0];
+		});
+};
+
+//Removes duplicate values from array
+Array.prototype.unique = function(callback){
+	return this.reduce(
+		(callback)?
+		function(acc,val1){
+			if(!acc.some(function(val2){ return callback(val1,val2) })) acc.push(val1);
+			return acc;
+		}:
+		function(acc,val){
+			if(!acc.contains(val)) acc.push(val);
+			return acc;
+		},
+		[]
+	);
+};
+
+//Merges two arrays
+Array.prototype.merge = function(list,callback){
+	return this.concat(list).reduce(
+		(callback)?
+		function(acc,val1){
+			var index = acc.findIndex(function(val2){ return callback(val1,val2) });
+			if(index<0) acc.push(val1);
+			else acc[index] = val1;
+			return acc;
+		}:
+		function(acc,val){
+			var index = acc.indexOf(val);
+			if(index<0) acc.push(val);
+			else acc[index] = val;
+			return acc;
+		},
+		[]
+	);
+};
+
+//Intersects two arrays
+Array.prototype.intersect = function(list,callback){
+	return this.filter(
+		(callback)?
+		function(val1){
+			return list.some(function(val2){ return callback(val1,val2) });
+		}:
+		function(val){
+			return list.contains(val);
+		}
+	);
+};
+
+//Subtracts two arrays
+Array.prototype.subtract = function(list,callback){
+	return this.filter(
+		(callback)?
+		function(val1){
+			return !list.some(function(val2){ return callback(val1,val2) });
+		}:
+		function(val){
+			return !list.contains(val);
+		}
+	);
 };
 
 //Removes first element that fulfills condition
@@ -134,6 +157,32 @@ Array.prototype.removeAll = function(callback){
 	return list;
 };
 
+/* -------------------- Polyfills -------------------- */
+
+//Provides find support to Array
+if(!Array.prototype.find)
+Array.prototype.find = function(callback){
+	for(var i=0; i<this.length; i++){
+		if(callback(this[i],i,this)) return this[i];}
+	return undefined;
+};
+
+//Provides findIndex support to Array
+if(!Array.prototype.findIndex)
+Array.prototype.findIndex = function(callback){
+	for(var i=0; i<this.length; i++){
+		if(callback(this[i],i,this)) return i;}
+	return -1;
+};
+
+//Provides forEach support to DOM HTMLCollection
+if(window.HTMLCollection && !HTMLCollection.prototype.forEach)
+HTMLCollection.prototype.forEach = Array.prototype.forEach;
+
+//Provides forEach support to DOM NodeList
+if(window.NodeList && !NodeList.prototype.forEach)
+NodeList.prototype.forEach = Array.prototype.forEach;
+
 /* -------------------- Functions -------------------- */
 
 //Returns true if string contains only whitespaces
@@ -141,63 +190,109 @@ function isempty(str){
 	return (!str || !(/\S/.test(str)));
 }
 
-//Adds class name
-function addClass(target,str){
-	if(!target.className.contains(str)) target.className = (target.className+" "+str).trim();
+//Returns true if DOM element is hidden
+function ishidden(element){
+	//return (window.getComputedStyle(element).display=="none");
+	return element.className.contains("hidden");
 }
 
-//Removes class name
-function removeClass(target,str){
-	if(target.className.contains(str)) target.className = target.className.replace(str,"").trim();
+//Gets DOM template element
+function getTemplateById(id){
+	var template = document.getElementById(id);
+	return document.importNode(template.content || template,true);
 }
 
-//Toggles class name
-function toggleClass(target,str){
-	if(!target.className.contains(str)) addClass(target,str);
-	else removeClass(target,str);
+//Adds class name of DOM element
+function addClass(element,str){
+	if(!element.className.contains(str)) element.className = (element.className+" "+str).trim();
 }
 
-//Returns true if element is hidden
-function isHiddenElement(target){
-	return target.className.contains("hidden");
+//Adds class name of all DOM elements from list
+function addClassAll(list,str){
+	list.forEach(function(element){ addClass(element,str) });
 }
 
-//Shows element
-function showElement(target){
-	removeClass(target,"hidden");
+//Removes class name of DOM element
+function removeClass(element,str){
+	element.className = element.className.removeAll(str).trim();
 }
 
-//Shows element list
-function showElements(list){
-	list.forEach(function(val){removeClass(val,"hidden")});
+//Removes class name of all DOM elements from list
+function removeClassAll(list,str){
+	list.forEach(function(element){ removeClass(element,str) });
 }
 
-//Hides element
-function hideElement(target){
-	addClass(target,"hidden");
+//Toggles class name of DOM element
+function toggleClass(element,str){
+	if(!element.className.contains(str)) element.className = (element.className+" "+str).trim();
+	else element.className = element.className.removeAll(str).trim();
 }
 
-//Hides element list
-function hideElements(list){
-	list.forEach(function(val){addClass(val,"hidden")});
+//Toggles class name of all DOM elements from list
+function toggleClassAll(list,str){
+	list.forEach(function(element){ toggleClass(element,str) });
 }
 
-//Toggles element
-function toggleElement(target){
-	toggleClass(target,"hidden");
+//Shows DOM element
+function showElement(element){
+	if(element) removeClass(element,"hidden");
 }
 
-//Toggles element list
-function toggleElements(list){
-	list.forEach(function(val){toggleClass(val,"hidden")});
+//Shows all DOM elements from list
+function showElementAll(list){
+	list.forEach(showElement);
 }
 
-//Removes element
-function removeElement(target){
-	if(target) target.parentNode.removeChild(target);
+//Hides DOM element
+function hideElement(element){
+	if(element) addClass(element,"hidden");
 }
 
-//Removes element list
-function removeElements(list){
-	list.forEach(function(val){val.parentNode.removeChild(val)});
+//Hides all DOM elements from list
+function hideElementAll(list){
+	list.forEach(hideElement);
+}
+
+//Toggles DOM element
+function toggleElement(element){
+	if(element) toggleClass(element,"hidden");
+}
+
+//Toggles all DOM elements from list
+function toggleElementAll(list){
+	list.forEach(toggleElement);
+}
+
+//Removes DOM element
+function removeElement(element){
+	if(element) element.parentElement.removeChild(element);
+}
+
+//Removes all DOM elements from list
+function removeElementAll(list){
+	list.forEach(removeElement);
+}
+
+//Imports text file
+//args = {(mandatory) files, (optional) accept, success, error}
+function importfile(args){
+	Array.prototype.forEach.call(args.files,function(file){
+		var fileext = file.name.substring(file.name.lastIndexOf("."));
+		if(!args.accept || args.accept.contains(file.type) || args.accept.contains(fileext)){
+			var reader = new FileReader();
+			if(args.success) reader.onload = function(){ args.success(this.result) };
+			if(args.error) reader.onerror = function(event){ args.error(event.target.error) };
+			reader.readAsText(file);}
+		else if(args.error) args.error();
+	});
+}
+
+//Exports UTF-8 BOM text file
+//args = {(mandatory) filename, filetype, data}
+function exportfile(args){
+	var link = document.createElement("a");
+	link.download = args.filename;
+	link.href = "data:"+args.filetype+";charset=UTF-8,\uFEFF"+encodeURI(args.data);
+	document.body.appendChild(link);
+	link.click();
 }
