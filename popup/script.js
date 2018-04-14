@@ -1,3 +1,13 @@
+/* -------------------- PreProcess -------------------- */
+
+//Global constants
+const PORT_BROWSERACTION = "browser_action";
+const BROWSERACTION_ICON = {
+	1: "/images/icon-normal.png",
+	2: "/images/icon-confirm.png",
+	3: "/images/icon-blocking.png"
+};
+
 /* -------------------- Functions -------------------- */
 
 //Sets Restore Last button
@@ -18,25 +28,20 @@ function setrestorelastbtn(lasttab){
 /* -------------------- Main Process -------------------- */
 
 //Global variables
-const BROWSERACTION_ICON = {
-	1: "/images/icon-normal.png",
-	2: "/images/icon-confirm.png",
-	3: "/images/icon-blocking.png"
-};
 var port = browser.runtime.Port;
 
 window.onload = function(){
 	//Connects port with background script
-	port = browser.runtime.connect({name: "popup"});
+	port = browser.runtime.connect({name: PORT_BROWSERACTION});
 	
 	//Retrieves data from port
 	port.onMessage.addListener(function(msg){
 		document.getElementById("icon").src = BROWSERACTION_ICON[msg.mode];
 		document.getElementById("nbopen").textContent = msg.opentabs.length;
 		document.getElementById("nbconfirm").textContent = msg.confirmtabs.length;
-		document.getElementById("nbclose").textContent = msg.closetabs.length;
+		document.getElementById("nbblocked").textContent = msg.blockedtabs.length;
 		document.getElementById("mode"+msg.mode).checked = true;
-		setrestorelastbtn(msg.closetabs.first());
+		setrestorelastbtn(msg.blockedtabs.first());
 	});
 	
 	//Modes
@@ -55,7 +60,9 @@ window.onload = function(){
 	document.querySelectorAll("i18n, [data-i18n]").forEach(seti18ndata);
 };
 
-//Disconnects port
+/* -------------------- PostProcess -------------------- */
+
 window.onunload = function(){
+	//Disconnects port
 	port.disconnect();
 };

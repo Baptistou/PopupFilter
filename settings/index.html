@@ -53,11 +53,11 @@
 						<div class="msgbox" data-i18n>No tabs</div>
 					</dd>
 					<dt class="active">
-						<span class="text"><i18n>Blocked tabs</i18n> : <span id="nbclose">0</span></span>
+						<span class="text"><i18n>Blocked tabs</i18n> : <span id="nbblocked">0</span></span>
 						<span class="icon"></span>
 					</dt>
 					<dd>
-						<table class="list-tabs" id="closetabs"></table>
+						<table class="list-tabs" id="blockedtabs"></table>
 						<div class="msgbox" data-i18n>No tabs</div>
 					</dd>
 				</dl>
@@ -168,12 +168,12 @@
 				</td>
 				<td>URL</td>
 				<td>
-					<span class="icon-true" title="Display" data-i18n></span><!--
-					--><span class="icon-false" title="Close" data-i18n></span>
+					<span class="icon-true" title="Display" data-i18n></span>
+					<span class="icon-false" title="Block" data-i18n></span>
 				</td>
 			</tr>
 		</template>
-		<template id="tpl-closetabs">
+		<template id="tpl-blockedtabs">
 			<tr>
 				<td>
 					<img class="image top" src="">

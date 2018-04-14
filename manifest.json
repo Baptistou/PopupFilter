@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "PopupFilter",
-	"version": "3.2",
+	"version": "3.3",
 	"author": "Baptiste Thémine",
 	"homepage_url": "https://github.com/Baptistou/PopupFilter",
 	"description": "__MSG_@manifest_description__",

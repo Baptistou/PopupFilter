@@ -1,4 +1,4 @@
-﻿PopupFilter version 3.2 by Baptiste Thémine
+﻿PopupFilter version 3.3 by Baptiste Thémine
 
 Prevents intempestive opening of popups from website scripts.
 
@@ -15,7 +15,7 @@ The main advantage and difference of PopupFilter is that it works without any bl
 
 --------------------------------------------------------------------------------
 
-PopupFilter version 3.2 par Baptiste Thémine
+PopupFilter version 3.3 par Baptiste Thémine
 
 Empêche les ouvertures intempestives de popups déclenchées par des scripts web.
 
@@ -36,6 +36,13 @@ Language support : English, French, Italian, Spanish.
 Browser support : Firefox 54+, Firefox Android 57+, Chrome 42+, Opera 33+.
 
 Updates :
+* version 3.3 (14/04/2018)
+- Fix issue with invalid tab id on browser.tabs.onAttached on Firefox Quantum 57-60.
+- Fix some icon font issue on Windows 10.
+- Fix CSS for private tab list in Settings page.
+- Prevent some potential issues in functions.js.
+- Code and performance improvements.
+
 * version 3.2 (25/03/2018)
 - Fix CSP sandbox invalid option.
 - Add browserAction title translation for Firefox Android.
@@ -60,7 +67,7 @@ Stable release :)
 - Add options_ui to manifest.json.
 - Add Restore Last button to browserAction popup.
 - Add duplicate tab grouping in Settings page.
-- Add different color to private tabs in Settings page.
+- Add different color to private tab list in Settings page.
 - Modify "About" block in Settings page.
 
 * version 1.9 (08/11/2017)

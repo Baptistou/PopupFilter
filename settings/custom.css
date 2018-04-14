@@ -202,19 +202,19 @@ dl.accordion>dt>.icon {
 	right: 0;
 	bottom: 0;
 	height: 30rem;
-	line-height: 30rem;
+	line-height: 28rem;
 	width: 40rem;
 	margin: auto;
-	font-size: 20rem;
+	font-size: 30rem;
 	text-align: center;
 }
 
 dl.accordion>dt>.icon::before {
-	content: "\2795";
+	content: "\FF0B";
 }
 
 dl.accordion>dt.active>.icon::before {
-	content: "\2796";
+	content: "\FF0D";
 }
 
 dl.accordion>dd	 {
@@ -238,17 +238,26 @@ table.list-tabs {
 	border-collapse: collapse;
 }
 
+table.list-tabs>tr {
+	border-top: 1rem solid #E0E0E0;
+	cursor: default;
+}
+
 table.list-tabs>tr:first-child {
 	border-top: 0;
 }
 
-table.list-tabs>tr {
-	border-top: 1rem solid #E0E0E0;
+table.list-tabs>tr:hover {
+	background-color: #E0E0E0;
 }
 
 table.list-tabs>tr.incognito {
-	background-color: #888888;
+	background-color: #999999;
 	color: white;
+}
+
+table.list-tabs>tr.incognito:hover {
+	background-color: #888888;
 }
 
 table.list-tabs>tr>td:nth-child(1) {

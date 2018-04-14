@@ -12,6 +12,7 @@
 	"@options_showbadge": {"message": "Show the tab count badge in the action button :"},
 	"About": {"message": "About"},
 	"Background": {"message": "Background"},
+	"Block": {"message": "Block"},
 	"Blocked": {"message": "Blocked"},
 	"Blocked_tabs": {"message": "Blocked tabs"},
 	"Blocking": {"message": "Blocking"},
