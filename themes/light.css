@@ -1,0 +1,92 @@
+/* -------------------- Colors -------------------- */
+
+body {
+	color: black;
+	background-color: white;
+}
+
+.link {
+	color: black;
+}
+
+header {
+	background-color: white;
+}
+
+header .header-button>button:hover {
+	background-color: #E8E8E8;
+}
+
+nav {
+	background-color: white;
+}
+
+nav .link {
+	color: #888888;
+}
+
+nav .link:hover {
+	background-color: #E8E8E8;
+}
+
+nav .link.active {
+	color: black;
+}
+
+nav .nav-button>button:hover {
+	background-color: #E8E8E8;
+}
+
+nav ul.list-actions {
+	background-color: white;
+}
+
+nav ul.list-actions button:hover {
+	background-color: #E8E8E8;
+}
+
+nav ul.list-actions button:disabled {
+	color: #888888;
+	background-color: white;
+}
+
+content ul.list-actions button:hover {
+	background-color: #E8E8E8;
+}
+
+content ul.list-actions button:disabled {
+	color: #888888;
+	background-color: white;
+}
+
+ul.slideshow {
+	background-color: white;
+}
+
+ul.list-options>li:hover {
+	background-color: #E8E8E8;
+}
+
+ul.list-options.fullwidth label:hover {
+	background-color: #E8E8E8;
+}
+
+table.list-tabs {
+	border-color: #F0F0F0;
+}
+
+table.list-tabs>tr {
+	border-color: #E0E0E0;
+}
+
+table.list-tabs>tr:hover {
+	background-color: #E8E8E8;
+}
+
+.icon-help {
+	background-color: #CCCCCC;
+}
+
+.icon-help:hover {
+	background-color: #BBBBBB;
+}

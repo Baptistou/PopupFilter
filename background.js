@@ -1,10 +1,11 @@
 /* -------------------- PreProcess -------------------- */
 
 //Global constants
+const PORT_BROWSERACTION = "browseraction", PORT_CONFIRM = "confirm", PORT_SETTINGS = "settings";
 const URL_CONFIRM = "/confirm/index.html", URL_SETTINGS = "/settings/index.html";
-const PORT_BROWSERACTION = "browser_action", PORT_CONFIRM = "confirm", PORT_SETTINGS = "settings";
 const MODE_NORMAL=1, MODE_CONFIRM=2, MODE_BLOCKING=3;
 const FOCUS_DEFAULT=1, FOCUS_BACKGROUND=2, FOCUS_FOREGROUND=3;
+const THEME_LIGHT=1, THEME_DARK=2;
 const BROWSERACTION_TITLE = {
 	1: "PopupFilter ("+geti18ndata("Normal")+")",
 	2: "PopupFilter ("+geti18ndata("Confirm")+")",
@@ -59,7 +60,46 @@ function TabHistory(){
 				else for(var prop in obj){
 					if(tab.mode==MODE_NORMAL || prop!="url") tab[prop] = obj[prop];}}
 		});
-		self.data.removeAll(val1 => (val1.mode==MODE_NORMAL && !list.find(val2 => (val1.id==val2.id))));
+		self.data = self.data.filter(val1 => (val1.mode!=MODE_NORMAL || list.find(val2 => (val1.id==val2.id))));
+	};
+	
+	//Removes duplicate tabs
+	this.unique = function(){
+		this.data = this.data.groupBy(tab => tab.mode)
+			.sort((group1,group2) => (group1.key-group2.key))
+			.flatMap(group => group.value.sort(sortbyposition))
+			.reduce(function(acc,tab){
+				if(tab.mode==MODE_BLOCKING || !acc.find(val => (val.url==tab.url))) acc.push(tab);
+				else closetab(tab);
+				return acc;
+			},[]);
+	};
+	
+	//Displays all confirm tabs
+	this.displayall = function(){
+		this.data.filter(tab => (tab.mode==MODE_CONFIRM))
+			.forEach(function(tab){
+				tab.mode = MODE_NORMAL;
+				browser.tabs.update(tab.id,{url: tab.url});
+			});
+	};
+	
+	//Blocks all confirm tabs
+	this.blockall = function(){
+		this.data.filter(tab => (tab.mode==MODE_CONFIRM))
+			.forEach(function(tab){
+				tab.mode = MODE_BLOCKING;
+				closetab(tab);
+			});
+	};
+	
+	//Restores all blocked tabs
+	this.restoreall = function(){
+		this.data = this.data.sort(sortbylast)
+			.filter(function(tab){
+				if(tab.mode==MODE_BLOCKING) opentab({url: tab.url, index: "next", active: false});
+				return (tab.mode!=MODE_BLOCKING);
+			});
 	};
 	
 	//Removes specifed tab from list
@@ -69,9 +109,9 @@ function TabHistory(){
 	
 	//Removes confirm and blocked tabs from list
 	this.clear = function(tabid){
-		this.data.removeAll(function(tab){
+		this.data = this.data.filter(function(tab){
 			if(tab.mode==MODE_CONFIRM) closetab(tab);
-			return (tab.mode==MODE_CONFIRM || tab.mode==MODE_BLOCKING);
+			return (tab.mode==MODE_NORMAL);
 		});
 	};
 }
@@ -80,13 +120,31 @@ function Settings(){
 //#	Variables
 	this.mode = MODE_NORMAL;
 	this.options = {};
+	this.ui = {};
 	this.tab = null;
 	this.sync = false;
 	var self = this;
-	var timeout1 = null;
-	var timeout2 = null;
 	
 //#	Constructors
+	var sendtimer = new Timer({
+		func: function(){
+			portcon.send(PORT_SETTINGS);
+			self.sync = false;
+		},
+		delay: 200
+	});
+	
+	var updatetimer = new Timer({
+		func: function(){
+			browser.tabs.query({},function(tabs){
+				tabhistory.merge(tabs);
+				self.updatebadge();
+				self.send();
+			});
+		},
+		delay: 200
+	});
+	
 	//Retrieves data from local storage
 	browser.storage.local.get(function(storage){
 		self.mode = storage.mode || MODE_NORMAL;
@@ -95,6 +153,12 @@ function Settings(){
 			applycsp: (self.options.applycsp!=false),
 			popupfocus: self.options.popupfocus || FOCUS_DEFAULT,
 			showbadge: (!ANDROID && self.options.showbadge!=false)
+		};
+		self.ui = storage.ui || {
+			theme: THEME_LIGHT,
+			browseraction: {actionmenu: null},
+			confirm: {},
+			settings: {section: null, accordion: null}
 		};
 		self.updatebutton();
 		self.updatebadge();
@@ -113,6 +177,12 @@ function Settings(){
 		for(var prop in obj) this.options[prop] = obj[prop];
 		this.updatebadge();
 		browser.storage.local.set({options: this.options});
+	};
+	
+	this.setui = function(page,obj){
+		if(obj.uitheme) this.ui.theme = obj.uitheme;
+		else for(var prop in obj.uistate) this.ui[page][prop] = obj.uistate[prop];
+		browser.storage.local.set({ui: this.ui});
 	};
 	
 	this.settab = function(tab){
@@ -140,31 +210,17 @@ function Settings(){
 	
 	//Sends data synchronously to Settings page
 	this.send = function(){
-		if(this.tab && this.tab.active){
-			if(timeout1) clearTimeout(timeout1);
-			timeout1 = setTimeout(function(){
-				portcon.send([PORT_SETTINGS]);
-				self.sync = false;
-				timeout1 = null;
-			},200);}
+		if(this.tab && this.tab.active) sendtimer.restart();
 		else this.sync = true;
 	};
 	
 	//Updates all tabs in history and sends data to Settings page
 	this.updatetabs = function(){
-		if(timeout2) clearTimeout(timeout2);
-		timeout2 = setTimeout(function(){
-			browser.tabs.query({},function(tabs){
-				tabhistory.merge(tabs);
-				settings.updatebadge();
-				settings.send();
-				timeout2 = null;
-			});
-		},200);
+		updatetimer.restart();
 	};
 	
 	//Updates browserAction button
-	//Note: No Firefox Android support for setIcon() and setBadgeBackgroundColor()
+	//Note: No Firefox Android support for browserAction.setIcon() and setBadgeBackgroundColor()
 	this.updatebutton = function(){
 		browser.browserAction.setTitle({title: BROWSERACTION_TITLE[this.mode]});
 		if(!ANDROID){
@@ -173,7 +229,7 @@ function Settings(){
 	};
 	
 	//Updates browserAction badge
-	//Note: No Firefox Android support for setBadgeText()
+	//Note: No Firefox Android support for browserAction.setBadgeText()
 	this.updatebadge = function(){
 		if(!ANDROID){
 			var badge = this.options.showbadge && tabhistory.data.count(tab => (tab.mode==this.mode)) || "";
@@ -260,51 +316,104 @@ function confirmcon(port){
 			break;}
 		}
 	});
-	portcon.send([PORT_CONFIRM]);
+	portcon.send(PORT_CONFIRM);
 }
 
-//Connects to popup and settings scripts
-function settingscon(port){
-	var browseractionid = ANDROID && port.name==PORT_BROWSERACTION && port.sender.tab.id;
+//Sends settings data to port
+function sendsettingsdata(){
+	return {
+		status: "settings",
+		opentabs: tabhistory.data.filter(val => (val.mode==MODE_NORMAL)).sort(sortbyposition),
+		confirmtabs: tabhistory.data.filter(val => (val.mode==MODE_CONFIRM)).sort(sortbylast),
+		blockedtabs: tabhistory.data.filter(val => (val.mode==MODE_BLOCKING)).sort(sortbylast),
+		mode: settings.mode,
+		options: settings.options
+	};
+}
+
+//Gets browseraction data received from port message
+function getbrowseractiondata(msg){
+	switch(msg.status){
+	case "mode" : settings.setmode(msg.mode);
+	break;
+	case "ui" : settings.setui(PORT_BROWSERACTION,msg);
+	break;
+	case "open_settings" : settings.open();
+	break;
+	case "remove_duplicates" : tabhistory.unique();
+	break;
+	case "restore_tab" :
+		tabhistory.remove(msg.tab.id);
+		opentab({url: msg.tab.url, index: "next", active: false});
+	break;}
+	portcon.send([PORT_BROWSERACTION,PORT_SETTINGS]);
+}
+
+//Connects to browseraction script
+function browseractioncon(port){
 	portcon.connect({
 		port: port,
-		msgpost: function(){ return {
-			opentabs: tabhistory.data.filter(val => (val.mode==MODE_NORMAL)).sort(sortbyposition),
-			confirmtabs: tabhistory.data.filter(val => (val.mode==MODE_CONFIRM)).sort(sortbylast),
-			blockedtabs: tabhistory.data.filter(val => (val.mode==MODE_BLOCKING)).sort(sortbylast),
-			mode: settings.mode,
-			options: settings.options
-		}},
-		msgget: function(msg){
-			switch(msg.status){
-			case "settings" : settings.open();
-			break;
-			case "mode" : settings.setmode(msg.mode);
-			break;
-			case "options" : settings.setoptions(msg.options);
-			break;
-			case "display" :
-				tabhistory.set({id: msg.tab.id, mode: MODE_NORMAL});
-				browser.tabs.update(msg.tab.id,{url: msg.tab.url});
-			break;
-			case "block" :
-				tabhistory.set({id: msg.tab.id, mode: MODE_BLOCKING});
-				closetab(msg.tab);
-			break;
-			case "restore" :
-				tabhistory.remove(msg.tab.id);
-				opentab({url: msg.tab.url, index: "next", active: false});
-			break;
-			case "clear" :
-				tabhistory.clear();
-				settings.updatebadge();
-			break;}
-			portcon.send([PORT_BROWSERACTION,PORT_SETTINGS]);
-		},
+		msgpost: sendsettingsdata,
+		msgget: getbrowseractiondata,
 		disconnect: function(){
-			if(port.name==PORT_SETTINGS) settings.close();
-			if(browseractionid) tabhistory.remove(browseractionid);
+			if(ANDROID && port.sender.tab.id) tabhistory.remove(port.sender.tab.id);
 		}
+	});
+	portcon.send({
+		port: PORT_BROWSERACTION,
+		msg: {status: "ui", uitheme: settings.ui.theme, uistate: settings.ui[PORT_BROWSERACTION]}
+	});
+	portcon.send([PORT_BROWSERACTION,PORT_SETTINGS]);
+}
+
+//Gets settings data received from port message
+function getsettingsdata(msg){
+	switch(msg.status){
+	case "mode" : settings.setmode(msg.mode);
+	break;
+	case "options" : settings.setoptions(msg.options);
+	break;
+	case "ui" : settings.setui(PORT_SETTINGS,msg);
+	break;
+	case "display_tab" :
+		tabhistory.set({id: msg.tab.id, mode: MODE_NORMAL});
+		browser.tabs.update(msg.tab.id,{url: msg.tab.url});
+	break;
+	case "display_all" : tabhistory.displayall();
+	break;
+	case "remove_duplicates" : tabhistory.unique();
+	break;
+	case "block_tab" :
+		tabhistory.set({id: msg.tab.id, mode: MODE_BLOCKING});
+		closetab(msg.tab);
+	break;
+	case "block_all" : tabhistory.blockall();
+	break;
+	case "restore_tab" :
+		tabhistory.remove(msg.tab.id);
+		opentab({url: msg.tab.url, index: "next", active: false});
+	break;
+	case "restore_all" : tabhistory.restoreall();
+	break;
+	case "clear" :
+		tabhistory.clear();
+		settings.updatebadge();
+	break;}
+	portcon.send([PORT_BROWSERACTION,PORT_SETTINGS]);
+}
+
+//Connects to settings script
+function settingscon(port){
+	settings.settab(port.sender.tab);
+	portcon.connect({
+		port: port,
+		msgpost: sendsettingsdata,
+		msgget: getsettingsdata,
+		disconnect: function(){ settings.close() }
+	});
+	portcon.send({
+		port: PORT_SETTINGS,
+		msg: {status: "ui", uitheme: settings.ui.theme, uistate: settings.ui[PORT_SETTINGS]}
 	});
 	portcon.send([PORT_BROWSERACTION,PORT_SETTINGS]);
 }
@@ -401,7 +510,8 @@ browser.runtime.onConnect.addListener(function(port){
 	switch(port.name){
 	case PORT_CONFIRM : confirmcon(port);
 	break;
-	case PORT_SETTINGS : settings.settab(port.sender.tab);
-	case PORT_BROWSERACTION : settingscon(port);
+	case PORT_BROWSERACTION : browseractioncon(port);
+	break;
+	case PORT_SETTINGS : settingscon(port);
 	break;}
 });

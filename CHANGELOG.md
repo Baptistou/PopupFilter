@@ -1,4 +1,15 @@
-﻿# PopupFilter 3.3 - CHANGELOG
+﻿# PopupFilter 4.0 - CHANGELOG
+
+**version 4.0 (09/06/2018)**
+- Fix some minor issues.
+- Add new design in browserAction popup and Settings page.
+- Add new features to action menu in browserAction popup and Settings page.
+- Add information slideshow to "About" block in Settings page.
+- Add light & dark themes.
+- Add user interface persistence.
+- Update some i18n translations.
+- Remove footer from Settings page.
+- Code and performance improvements.
 
 **version 3.3 (14/04/2018)**
 - Fix issue with invalid tab id on browser.tabs.onAttached on Firefox Quantum 57-60.

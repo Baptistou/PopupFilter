@@ -1,0 +1,224 @@
+/* -------------------- Global definitions -------------------- */
+
+* {
+	box-sizing: border-box;
+	font-family: "Segoe UI";
+	font-size: 100%;
+}
+
+html {
+	font-size: 0.85px;
+}
+
+body {
+	margin: 0;
+	font-size: 20rem;
+	background-color: white;
+}
+
+p {
+	margin: 10rem 0;
+}
+
+button {
+	color: inherit;
+}
+
+.top {
+	vertical-align: top !important;
+}
+
+.middle {
+	vertical-align: middle !important;
+}
+
+.bottom {
+	vertical-align: bottom !important;
+}
+
+.left {
+	text-align: left !important;
+}
+
+.center {
+	text-align: center !important;
+}
+
+.right {
+	text-align: right !important;
+}
+
+.hidden {
+	display: none !important;
+}
+
+@keyframes fadein {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+/* -------------------- Header -------------------- */
+
+header {
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	height: 50rem;
+	line-height: 50rem;
+	font-size: 24rem;
+	background-color: white;
+	box-shadow: 0 0 5rem rgba(0,0,0,0.175);
+	/* Fix text selection issue on click */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	/* Fix zoom issue on mobile screen */
+	overflow: hidden;
+}
+
+header .header-title {
+	display: block;
+	float: left;
+}
+
+header .header-title>.image {
+	display: block;
+	float: left;
+	height: 50rem;
+	width: 50rem;
+}
+
+header .header-title>.text {
+	display: inline-block;
+	padding: 0 10rem 0 10rem;
+}
+
+header .header-button {
+	display: block;
+	float: right;
+	border-left: 1px solid #E0E0E0;
+}
+
+header .header-button>button {
+	display: block;
+	height: 50rem;
+	width: 50rem;
+	border: none;
+	background: none;
+	text-align: center;
+	cursor: pointer;
+}
+
+header .header-button>button:hover {
+	background-color: #E8E8E8;
+}
+
+/* -------------------- Content -------------------- */
+
+content {
+	display: table;
+	min-width: 300rem;
+	margin: auto;
+	padding: 50rem 0 0 0;
+}
+
+content section {
+	display: block;
+	animation: fadein 0.5s;
+}
+
+table.tabstatus {
+	display: table;
+	table-layout: fixed;
+	width: 300rem;
+	margin: 10rem auto auto auto;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+table.tabstatus>tbody>tr>td {
+	padding: 2rem 10rem 2rem 10rem;
+	border: 1px solid #E0E0E0;
+	overflow: hidden;
+}
+
+ul.list-options {
+	display: block;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.list-options>li:hover {
+	background-color: #E8E8E8;
+}
+
+ul.list-options.vertical>li {
+	padding: 5rem;
+}
+
+ul.list-options.horizontal>li {
+	display: inline-block;
+	padding: 5rem;
+	margin: 0 5rem 0 5rem;
+}
+
+ul.list-options.fullwidth label {
+	display: block;
+	line-height: 50rem;
+	padding: 0 5rem 0 5rem;
+}
+
+ul.list-options.fullwidth label:hover {
+	background-color: #E8E8E8;
+}
+
+ul.list-actions {
+	display: block;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.list-actions>li {
+	border-top: 1px solid #E0E0E0;
+}
+
+#overview.hidden~#action_menu ul.list-actions>li:first-child {
+	border-top: none;
+}
+
+ul.list-actions button {
+	display: block;
+	height: 50rem;
+	width: 100%;
+	padding: 0 10rem 0 10rem;
+	border: none;
+	text-align: left;
+	white-space: pre;
+	background: none;
+	cursor: pointer;
+}
+
+ul.list-actions button:hover {
+	background-color: #E8E8E8;
+}
+
+ul.list-actions button:disabled {
+	color: #888888;
+	background-color: white;
+}
+
+/* -------------------- Icons -------------------- */
+
+.icon-hamburger::before {
+	content: "\2630";
+}
+
+.icon-close::before {
+	content: "\2715";
+}

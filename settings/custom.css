@@ -38,6 +38,10 @@ p {
 	margin: 10rem 0;
 }
 
+button {
+	color: inherit;
+}
+
 input:disabled+label {
 	color: #888888;
 }
@@ -70,77 +74,165 @@ input:disabled+label {
 	display: none !important;
 }
 
+@keyframes fadein {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
 /* -------------------- Components -------------------- */
 
-.button {
-	display: inline-block;
-	height: 34rem;
-	line-height: 32rem;
-	min-width: 100rem;
-	margin: 0;
-	padding: 0 10rem 0 10rem;
-	border: 1rem solid #000042;
-	font-size: 18rem;
-	text-decoration: none;
-	text-align: center;
-	background-color: #000042;
-	color: white;
+.link {
+	color: black;
+	text-decoration: underline;
 	cursor: pointer;
-	/* Fix bug in touch screen */
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-.button:hover {
-	border-color: #0042AA;
-	background-color: #0042AA;
-	transition: 0.2s;
-}
-
-.button:disabled {
-	border-color: #5B6C7D;
-	background-color: #5B6C7D;
-	color: #E0E0E0;
-}
-
-/* Fix CSS bug in Firefox */
-.button::-moz-focus-inner {
-	padding: 0;
-	border: 0;
 }
 
 img.image {
 	display: inline-block;
 	width: 300rem;
 	max-width: 100%;
+	/* Fix link border issue on IE 10- */
+	border: none;
 }
 
 /* -------------------- Navigation bar -------------------- */
 
 nav {
 	display: block;
-	max-width: 800rem;
-	margin: auto;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	height: 50rem;
+	line-height: 50rem;
 	font-size: 24rem;
+	background-color: white;
+	box-shadow: 0 0 5rem rgba(0,0,0,0.175);
+	/* Fix text selection issue on click */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	/* Fix zoom issue on mobile screen */
+	overflow: hidden;
+}
+
+nav .nav-title {
+	display: block;
+	float: left;
+	border-right: 1px solid #E0E0E0;
+}
+
+nav .nav-title>.image {
+	display: block;
+	float: left;
+	height: 50rem;
+	width: 50rem;
+}
+
+nav .nav-title>.text {
+	display: inline-block;
 	padding: 0 10rem 0 10rem;
 }
 
 nav .link {
-	padding: 5rem;
+	display: inline-block;
+	padding: 0 10rem 0 10rem;
 	color: #888888;
 	text-decoration: none;
 	cursor: pointer;
 }
 
 nav .link:hover {
-	background-color: #E0E0E0;
+	background-color: #E8E8E8;
 }
 
 nav .link.active {
-	color: #0042AA;
+	color: black;
 	text-decoration: underline;
+}
+
+nav ul.nav-menu {
+	display: table;
+	float: left;
+	margin: 0;
+	padding: 0;
+	letter-spacing: -0.31em;
+	list-style: none;
+}
+
+nav ul.nav-menu>li {
+	display: inline-block;
+	letter-spacing: normal;
+}
+
+nav .nav-button {
+	display: block;
+	float: right;
+	border-left: 1px solid #E0E0E0;
+}
+
+nav .nav-button>button {
+	display: block;
+	height: 50rem;
+	width: 50rem;
+	border: none;
+	background: none;
+	text-align: center;
+	cursor: pointer;
+}
+
+nav .nav-button>button:hover {
+	background-color: #E8E8E8;
+}
+
+ul.list-actions {
+	display: block;
+	position: fixed;
+	top: 50rem;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 20rem;
+	background-color: white;
+	box-shadow: 0 0 5rem rgba(0,0,0,0.175);
+	animation: fadein 0.5s;
+}
+
+ul.list-actions>li {
+	border-top: 1px solid #E0E0E0;
+}
+
+ul.list-actions>li:first-child {
+	border-top: none;
+}
+
+ul.list-actions button {
+	display: block;
+	height: 50rem;
+	width: 100%;
+	padding: 0 10rem 0 10rem;
+	border: none;
+	text-align: left;
+	white-space: pre;
+	background: none;
+	cursor: pointer;
+}
+
+ul.list-actions button:hover {
+	background-color: #E8E8E8;
+}
+
+ul.list-actions button:disabled {
+	color: #888888;
+	background-color: white;
+}
+
+@media screen and (orientation: portrait) and (max-width: 500px) {
+	nav .nav-title { border-right: none; }
+	nav .nav-title>.text { display: none; }
 }
 
 /* -------------------- Content -------------------- */
@@ -149,13 +241,21 @@ content {
 	display: block;
 	max-width: 800rem;
 	margin: auto;
-	padding: 0 10rem 50rem 10rem;
+	padding: 50rem 10rem 0 10rem;
+}
+
+@media screen and (min-width: 1600px) {
+	content { max-width: 50%; }
 }
 
 .block {
 	display: block;
 	margin: 20rem 0 20rem 0;
 	border-top: 1px solid #E0E0E0;
+}
+
+.block:first-child {
+	border-top: none;
 }
 
 h2 .link {
@@ -176,8 +276,8 @@ dl.accordion>dt	 {
 	border: 1rem solid #AAAAAA;
 	border-width: 0 1rem 1rem 1rem;
 	font-size: 20rem;
-	background-color: #5B6C7D;
 	color: white;
+	background-color: #5B6C7D;
 	cursor: pointer;
 }
 
@@ -202,7 +302,7 @@ dl.accordion>dt>.icon {
 	right: 0;
 	bottom: 0;
 	height: 30rem;
-	line-height: 28rem;
+	line-height: 30rem;
 	width: 40rem;
 	margin: auto;
 	font-size: 30rem;
@@ -224,7 +324,6 @@ dl.accordion>dd	 {
 	padding: 0;
 	border: 1rem solid #AAAAAA;
 	border-width: 0 1rem 1rem 1rem;
-	background-color: white;
 }
 
 dl.accordion>dt.active+dd {
@@ -236,6 +335,11 @@ table.list-tabs {
 	table-layout: fixed;
 	width: 100%;
 	border-collapse: collapse;
+	/* Fix text selection issue on click */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 table.list-tabs>tr {
@@ -248,16 +352,16 @@ table.list-tabs>tr:first-child {
 }
 
 table.list-tabs>tr:hover {
-	background-color: #E0E0E0;
+	background-color: #E8E8E8;
 }
 
 table.list-tabs>tr.incognito {
-	background-color: #999999;
+	background-color: #888888;
 	color: white;
 }
 
 table.list-tabs>tr.incognito:hover {
-	background-color: #888888;
+	background-color: #777777;
 }
 
 table.list-tabs>tr>td:nth-child(1) {
@@ -315,52 +419,98 @@ table.list-tabs:empty~.msgbox {
 
 /* -------------------- Settings -------------------- */
 
-ul.list-options-v {
+ul.slideshow {
 	display: block;
+	position: relative;
 	margin: 10rem 0 10rem 0;
+	padding: 0;
+	list-style: none;
+	background-color: white;
+}
+
+ul.slideshow>li {
+	display: none;
+}
+
+ul.slideshow>li.active {
+	display: list-item;
+	position: relative;
+	padding: 2rem 10rem 2rem 10rem;
+	box-shadow: 0 0 2rem rgba(0,0,0,0.2);
+	animation: fadein 1s;
+}
+
+ul.slideshow>.arrow-next {
+	display: inline-block;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+	line-height: 25rem;
+	width: 25rem;
+	text-align: center;
+	color: white;
+	background-color: black;
+	opacity: 0.2;
+	cursor: pointer;
+}
+
+ul.slideshow>.arrow-next:hover {
+	opacity: 0.4;
+}
+
+ul.slideshow>.arrow-next::before {
+	content: "\276F";
+}
+
+ul.slideshow p {
+	display: block;
+	overflow: hidden;
+}
+
+ul.slideshow img.image {
+	display: block;
+	float: left;
+	height: 50rem;
+	width: 50rem;
+	margin-right: 10rem;
+}
+
+ul.list-options {
+	display: block;
+	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-ul.list-options-v>li {
-	padding: 5rem 0 5rem 0;
+ul.list-options>li:hover {
+	background-color: #E8E8E8;
 }
 
-ul.list-options-v>li:hover {
-	background-color: #E0E0E0;
+ul.list-options.vertical>li {
+	padding: 5rem;
 }
 
-ul.list-options-h {
-	display: block;
-	margin: 10rem 0 10rem 0;
-	padding: 0;
-}
-
-ul.list-options-h>li {
+ul.list-options.horizontal>li {
 	display: inline-block;
 	padding: 5rem;
 	margin: 0 5rem 0 5rem;
 }
 
-ul.list-options-h>li:hover {
-	background-color: #E0E0E0;
+ul.list-options.fullwidth label {
+	display: block;
+	padding: 5rem;
 }
 
-/* -------------------- Footer -------------------- */
-
-footer {
-	display: block;
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	padding: 10rem;
-	text-align: center;
-	background-color: white;
-	box-shadow: 0 0 5rem rgba(0,0,0,0.175);
+ul.list-options.fullwidth label:hover {
+	background-color: #E8E8E8;
 }
 
 /* -------------------- Icons -------------------- */
+
+.icon-hamburger::before {
+	content: "\2630";
+}
 
 .icon-true, .icon-false, .icon-reset {
 	display: inline-block;

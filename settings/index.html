@@ -9,6 +9,7 @@
 		<!-- FAVICON & CSS -->
 		<link rel="icon" type="image/x-icon" href="/images/icon-blocking.ico">
 		<link rel="stylesheet" type="text/css" href="custom.css">
+		<link rel="stylesheet" type="text/css" id="include_theme">
 		
 		<!-- JAVASCRIPT -->
 		<script type="text/javascript" src="/functions.js"></script>
@@ -17,18 +18,30 @@
     </head>
 	
     <body>
-		<!-- HEADER -->
-		<header>
-			<h1 class="center">
-				<img class="middle" id="icon" src="/images/icon48.png">
-				<span class="middle">PopupFilter</span>
-			</h1>
-		</header>
-		
 		<!-- NAVIGATION BAR -->
 		<nav>
-			<a class="link active" href="#overview" data-i18n>Overview</a>
-			<a class="link" href="#settings" data-i18n>Settings</a>
+			<div class="nav-title">
+				<img class="image" id="icon" src="/images/icon64.png">
+				<span class="text">PopupFilter</span>
+			</div>
+			<ul class="nav-menu">
+				<li><a class="link active" href="#overview" data-i18n>Overview</a></li>
+				<li><a class="link" href="#settings" data-i18n>Settings</a></li>
+			</ul>
+			<div class="nav-button">
+				<button id="toggle_action" title="Action menu" data-i18n><span class="icon-hamburger"></span></button>
+				<ul class="list-actions hidden" id="action_menu">
+					<li><button id="merge_windows" data-i18n>Merge all windows</button></li>
+					<li><button id="close_windows" data-i18n>Close other windows</button></li>
+					<li><button id="remove_duplicates" data-i18n>Remove duplicate tabs</button></li>
+					<li><button id="display_all" data-i18n>Display all confirm tabs</button></li>
+					<li><button id="block_all" data-i18n>Block all confirm tabs</button></li>
+					<li><button id="restore_last" data-i18n>Restore last blocked tab</button></li>
+					<li><button id="restore_all" data-i18n>Restore all blocked tab</button></li>
+					<li><button id="clear" data-i18n>Clear history</button></li>
+					<li><button id="close" data-i18n>Close</button></li>
+				</ul>
+			</div>
 		</nav>
 		
 		<!-- CONTENT -->
@@ -67,23 +80,55 @@
 			<section class="hidden" id="settings">
 				<!-- ABOUT -->
 				<div class="block">
-					<h2><i18n>About</i18n> <a class="link" href="/README.txt" title="More Info" data-i18n><span class="icon-help"></span></a></h2>
-					<p>
-						PopupFilter <i18n>version</i18n> <span id="version"></span> <i18n>by</i18n> <span id="author"></span>.</p>
-					<p>
-						<span id="description"></span><br>
-						<i18n data="about_review">If you like this add-on or have some ideas to improve it, please send a comment on</i18n>
-						<a class="link" href="https://addons.mozilla.org/firefox/addon/popupfilteraddon">AMO</a>.
-						<i18n data="about_github">If you encountered any issue, please report it on</i18n>
-						<a class="link" href="https://github.com/Baptistou/PopupFilter">GitHub</a>.
-						<i18n data="about_thanks">Thank you for downloading PopupFilter.</i18n>
-					</p>
+					<h2>
+						<i18n>About</i18n>
+						<a class="link ext" href="https://github.com/Baptistou/PopupFilter/blob/master/README.md" title="More info" data-i18n><span class="icon-help"></span></a>
+					</h2>
+					<p>PopupFilter <i18n>version</i18n> <span id="version"></span> <i18n>by</i18n> <span id="author"></span>.</p>
+					<ul class="slideshow">
+						<span class="arrow-next" title="Next message" data-i18n></span>
+						<li class="active">
+							<p>
+								<img class="image" src="/images/icon64.png">
+								<span id="description"></span>
+							</p>
+						</li>
+						<li>
+							<p>
+								<img class="image" src="/images/github.png">
+								<i18n data="about_github">PopupFilter is open source ! You can contribute, add a translation or report any issue on</i18n>
+								<a class="link ext" href="https://github.com/Baptistou/PopupFilter">GitHub</a>.
+							</p>
+						</li>
+						<li>
+							<p>
+								<img class="image" src="/images/firefox.png">
+								<i18n data="about_thanks">Thank you for downloading PopupFilter.</i18n>
+								<i18n data="about_review">If you like this add-on, please send a comment on</i18n>
+								<a class="link ext" href="https://addons.mozilla.org/firefox/addon/popupfilteraddon">AMO</a>.
+							</p>
+						</li>
+						<li>
+							<p>
+								<img class="image" src="/images/android.png">
+								<i18n data="about_android">PopupFilter is also available on Firefox Android.</i18n>
+							</p>
+						</li>
+						<li>
+							<p>
+								<img class="image" src="/images/chrome.png">
+								<i18n data="about_thanks">Thank you for downloading PopupFilter.</i18n>
+								<i18n data="about_review">If you like this add-on or have some ideas to improve it, please send a comment on</i18n>
+								<a class="link ext" href="https://chrome.google.com/webstore/detail/mlenfedpcojbeegkmpnhjlndjelijpij">Chrome Webstore</a>.
+							</p>
+						</li>
+					</ul>
 				</div>
 				
 				<!-- MODES -->
 				<div class="block">
 					<h2 data-i18n>Modes</h2>
-					<ul class="list-options-v">
+					<ul class="list-options vertical">
 						<li>
 							<input type="radio" name="mode" id="mode1" value="1">
 							<label for="mode1" data-i18n="mode_normal">Normal Mode : Allow the opening of new tabs and new windows.</label>
@@ -103,7 +148,7 @@
 				<div class="block">
 					<h2 data-i18n>Options</h2>
 					<p data-i18n="options_popupfocus">In Confirm Mode, new tabs/windows must be focused in :</p>
-					<ul class="list-options-h">
+					<ul class="list-options horizontal">
 						<li>
 							<input type="radio" name="popupfocus" id="popupfocus1" value="1">
 							<label for="popupfocus1" data-i18n>Default</label>
@@ -118,7 +163,7 @@
 						</li>
 					</ul>
 					<p data-i18n="options_applycsp">In Blocking Mode, apply Content Security Policy to strictly block popups :</p>
-					<ul class="list-options-h">
+					<ul class="list-options horizontal">
 						<li>
 							<input type="radio" name="applycsp" id="applycsp1" value="true">
 							<label for="applycsp1" data-i18n>Enable</label>
@@ -129,7 +174,7 @@
 						</li>
 					</ul>
 					<p data-i18n="options_showbadge">Show the tab count badge in the action button :</p>
-					<ul class="list-options-h">
+					<ul class="list-options horizontal">
 						<li>
 							<input type="radio" name="showbadge" id="showbadge1" value="true">
 							<label for="showbadge1" data-i18n>Enable</label>
@@ -140,17 +185,26 @@
 						</li>
 					</ul>
 				</div>
+				
+				<!-- THEME -->
+				<div class="block">
+					<h2 data-i18n>Theme</h2>
+					<ul class="list-options horizontal">
+						<li>
+							<input type="radio" name="uitheme" id="uitheme1" value="1">
+							<label for="uitheme1" data-i18n>Light</label>
+						</li>
+						<li>
+							<input type="radio" name="uitheme" id="uitheme2" value="2">
+							<label for="uitheme2" data-i18n>Dark</label>
+						</li>
+					</ul>
+				</div>
 			</section>
 		</content>
 		
-		<!-- FOOTER -->
-		<footer>
-			<button class="button" id="clear" data-i18n>Clear History</button>
-			<button class="button" id="close" data-i18n>Close</button>
-		</footer>
-		
 		<!-- TEMPLATES -->
-		<template id="tpl-opentabs">
+		<template id="tpl_opentabs">
 			<tr>
 				<td>
 					<img class="image top" src="">
@@ -160,7 +214,7 @@
 				<td><span class="icon-false" title="Close" data-i18n></span></td>
 			</tr>
 		</template>
-		<template id="tpl-confirmtabs">
+		<template id="tpl_confirmtabs">
 			<tr>
 				<td>
 					<img class="image top" src="">
@@ -173,7 +227,7 @@
 				</td>
 			</tr>
 		</template>
-		<template id="tpl-blockedtabs">
+		<template id="tpl_blockedtabs">
 			<tr>
 				<td>
 					<img class="image top" src="">

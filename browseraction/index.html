@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+        <!-- META INFORMATIONS -->
+        <meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>PopupFilter Overview</title>
+		
+		<!-- FAVICON & CSS -->
+		<link rel="icon" type="image/x-icon" href="/images/icon-blocking.ico">
+		<link rel="stylesheet" type="text/css" href="custom.css">
+		<link rel="stylesheet" type="text/css" id="include_theme">
+		
+		<!-- JAVASCRIPT -->
+		<script type="text/javascript" src="/functions.js"></script>
+		<script type="text/javascript" src="/webext.js"></script>
+		<script type="text/javascript" src="script.js"></script>
+    </head>
+	
+    <body>
+		<!-- HEADER -->
+		<header>
+			<div class="header-title">
+				<img class="image" id="icon" src="/images/icon64.png">
+				<span class="text">PopupFilter</span>
+			</div>
+			<div class="header-button">
+				<button id="toggle_action">
+					<span class="icon-hamburger"></span>
+					<span class="icon-close hidden"></span>
+				</button>
+			</div>
+		</header>
+		
+		<!-- CONTENT -->
+		<content>
+			<section id="overview">
+				<table class="tabstatus">
+					<tr>
+						<td data-i18n>Open</td>
+						<td data-i18n>Confirm</td>
+						<td data-i18n>Blocked</td>
+					</tr>
+					<tr>
+						<td><span id="nbopen">0</span></td>
+						<td><span id="nbconfirm">0</span></td>
+						<td><span id="nbblocked">0</span></td>
+					</tr>
+				</table>
+				<ul class="list-options fullwidth">
+					<li>
+						<label>
+							<input type="radio" name="mode" id="mode1" value="1">
+							<span data-i18n>Normal Mode</span>
+						</label>
+					</li>
+					<li>
+						<label>
+							<input type="radio" name="mode" id="mode2" value="2">
+							<span data-i18n>Confirm Mode</span>
+						</label>
+					</li>
+					<li>
+						<label>
+							<input type="radio" name="mode" id="mode3" value="3">
+							<span data-i18n>Blocking Mode</span>
+						</label>
+					</li>
+				</ul>
+				<ul class="list-actions">
+					<li><button id="open_settings1" data-i18n>Settings</button></li>
+				</ul>
+			</section>
+			
+			<section class="hidden" id="action_menu">
+				<ul class="list-actions">
+					<li><button id="merge_windows" data-i18n>Merge all windows</button></li>
+					<li><button id="close_windows" data-i18n>Close other windows</button></li>
+					<li><button id="remove_duplicates" data-i18n>Remove duplicate tabs</button></li>
+					<li><button id="restore_last" data-i18n>Restore last blocked tab</button></li>
+					<li><button id="open_settings2" data-i18n>Settings</button></li>
+				</ul>
+			</section>
+		</content>
+	</body>
+</html>

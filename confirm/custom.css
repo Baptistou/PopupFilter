@@ -54,7 +54,7 @@ body {
 	background-color: #000042;
 	color: white;
 	cursor: pointer;
-	/* Fix bug in touch screen */
+	/* Fix text selection issue on click */
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -73,7 +73,7 @@ body {
 	color: #E0E0E0;
 }
 
-/* Fix CSS bug in Firefox */
+/* Fix CSS issue on Firefox */
 .button::-moz-focus-inner {
 	padding: 0;
 	border: 0;

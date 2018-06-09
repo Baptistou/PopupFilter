@@ -14,14 +14,10 @@ window.onload = function(){
 	});
 	
 	//Displays tab
-	document.getElementById("display").onclick = function(){
-		port.postMessage({status: "display"});
-	};
+	document.getElementById("display").onclick = function(){ port.postMessage({status: "display"}) };
 	
 	//Blocks tab
-	document.getElementById("block").onclick = function(){
-		port.postMessage({status: "block"});
-	};
+	document.getElementById("block").onclick = function(){ port.postMessage({status: "block"}) };
 	
 	//Internationalization
 	document.querySelectorAll("i18n, [data-i18n]").forEach(seti18ndata);
