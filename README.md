@@ -1,6 +1,6 @@
-﻿# PopupFilter 4.0
+# PopupFilter 4.0
 
-**Prevents intempestive opening of popups from website links and scripts.**
+:uk: **Prevents intempestive opening of popups from website links and scripts.**
 
 PopupFilter is a simple and lightweight add-on designed with WebExtensions API and compatible with Firefox, Chrome and Opera.
 The role of this add-on is to block/filter every tabs opened by web scrips or links (which can be hidden in front of page sometimes), even with context menu "Open in...".
@@ -16,7 +16,7 @@ The main advantage and difference of PopupFilter is that it works without any bl
 
 --------------------------------------------------------------------------------
 
-**Empêche les ouvertures intempestives de popups déclenchées par des liens et des scripts web.**
+:fr: **Empêche les ouvertures intempestives de popups déclenchées par des liens et des scripts web.**
 
 PopupFilter est une extension simple et légère développée à l'aide de l'API WebExtensions et compatible avec les navigateurs Firefox, Chrome et Opera.
 Le rôle de cette extension est de bloquer/filtrer tous les onglets ouverts par des scripts web ou des liens (qui peuvent parfois être cachés devant la page), même avec le menu contextuel "Ouvrir dans...".
